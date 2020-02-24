@@ -8,6 +8,7 @@ Added interactive connection statistics to dashboard plus cron. Enable in Settin
 Added port selection to Install Load Balancer.
 Added ability to change port. Edit server, change the ports. Restart server afterwards.
 Added ability to reboot server instead of just restart services.
+Fixed newline in textareas.
 Changed year to appear in brackets instead of after a hyphen.
 Added option to extend sidebar in profile.
 Fixed various bugs.

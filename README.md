@@ -22,4 +22,3 @@ Beta Release 22B - Early Access
 * 70% translation completed... taking it's swweeeett time.
 * Hidden expired MAG / Enigma passwords in reseller dashboard.
 * 00:10 - Added current release to Settings page so you can stay up to date.
-* 00:10 - Added current release to Settings page so you can stay up to dat

@@ -1,14 +1,18 @@
 # Beta Release 22B - Early Access
 Beta Release 22B - Early Access
 
-* Changelog (Early Access):
+Changelog (Early Access):
+
 * Added advanced manual channel order.
 * Added bouquet ordering.
 * Partial localisation.
 * Various bug fixes.
 * Updated GeoIP Database.
 * 02:20 - Fixed bouquet bug.
-* Early Access R22B:
+
+
+Early Access R22B:
+
 * Fixed movies not showing in bouquet order.
 * Fixed activity logs page.
 * Added interactive connection statistics to dashboard plus cron. Enable in Settings.

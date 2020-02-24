@@ -1,7 +1,6 @@
 # Beta Release 22B - Early Access
-Beta Release 22B - Early Access
 
-Changelog (Early Access):
+# Changelog (Early Access):
 
 * Added advanced manual channel order.
 * Added bouquet ordering.
@@ -11,7 +10,7 @@ Changelog (Early Access):
 * 02:20 - Fixed bouquet bug.
 
 
-Early Access R22B:
+# Early Access R22B:
 
 * Fixed movies not showing in bouquet order.
 * Fixed activity logs page.

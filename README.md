@@ -1,5 +1,5 @@
-# XC-TR
-XC-Admin
+# Beta Release 22B - Early Access
+Beta Release 22B - Early Access
 
 * Changelog (Early Access):
 * Added advanced manual channel order.

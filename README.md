@@ -1,3 +1,5 @@
+# Beta Release 22C
+* Check on live connections the user agents from the users.
 # Beta Release 22B - Early Access
 
 # Changelog (Early Access):

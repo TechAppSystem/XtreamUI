@@ -44,8 +44,8 @@ if ($rSettings["sidebar"]) {
                             <h4 class="page-title"><?=$_["live_connections"]?></h4>
                         </div>
                     </div>
-                </div>     
-                <!-- end page title --> 
+                </div>
+                <!-- end page title -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -82,6 +82,7 @@ if ($rSettings["sidebar"]) {
                                             <th><?=$_["username"]?></th>
                                             <th><?=$_["stream"]?></th>
                                             <th><?=$_["server"]?></th>
+                                            <th><?=$_["user_agent"]?></th>
                                             <th class="text-center"><?=$_["time"]?></th>
                                             <th class="text-center"><?=$_["ip"]?></th>
                                             <th class="text-center"><?=$_["country"]?></th>
@@ -130,7 +131,7 @@ if ($rSettings["sidebar"]) {
         <script>
         var autoRefresh = true;
         var rClearing = false;
-        
+
         function toggleAuto() {
             if (autoRefresh == true) {
                 autoRefresh = false;
@@ -184,11 +185,11 @@ if ($rSettings["sidebar"]) {
 			});
             formCache.init();
             formCache.fetch();
-            
+
             <?php if (isset($_GET["server_id"])) { ?>
             $("#live_filter").val(<?=$_GET["server_id"]?>);
             <?php } ?>
-            
+
             $('select').select2({width: '100%'});
             $("#datatable-activity").DataTable({
                 language: {
@@ -218,7 +219,7 @@ if ($rSettings["sidebar"]) {
                     }
                 },
                 columnDefs: [
-                    {"className": "dt-center", "targets": [0,1,5,6,7,8]}
+                    {"className": "dt-center", "targets": [0,1,6,7,8],"className": "dt-centerLower", "targets": [5]}
                 ],
                 order: [[ 0, "desc" ]],
                 pageLength: <?=$rAdminSettings["default_entries"] ?: 10?>,
@@ -247,7 +248,7 @@ if ($rSettings["sidebar"]) {
             <?php } ?>
             $('#datatable-activity').DataTable().search($(this).val()).draw();
         });
-        
+
         $(window).bind('beforeunload', function() {
             formCache.save();
         });

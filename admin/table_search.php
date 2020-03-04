@@ -675,7 +675,7 @@ if ($rType == "users") {
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
                         $rStreamInfo["codecs"]["audio"] = "N/A";
                     }
-                    if ($rRow['bitrate'] == 0) { 
+                    if ($rRow['bitrate'] == 0) {
                         $rRow['bitrate'] = "?";
                     }
                     if (isset($rProgressInfo["speed"])) {
@@ -886,7 +886,7 @@ if ($rType == "users") {
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
                         $rStreamInfo["codecs"]["audio"] = "N/A";
                     }
-                    if ($rRow['bitrate'] == 0) { 
+                    if ($rRow['bitrate'] == 0) {
                         $rRow['bitrate'] = "?";
                     }
                     if (isset($rProgressInfo["speed"])) {
@@ -1068,7 +1068,7 @@ if ($rType == "users") {
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
                         $rStreamInfo["codecs"]["audio"] = "N/A";
                     }
-                    if ($rRow['bitrate'] == 0) { 
+                    if ($rRow['bitrate'] == 0) {
                         $rRow['bitrate'] = "?";
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>
@@ -1292,6 +1292,9 @@ if ($rType == "users") {
     if (strlen($_GET["user_id"]) > 0) {
         $rWhere[] = "`user_activity_now`.`user_id` = ".intval($_GET["user_id"]);
     }
+		if (strlen($_GET["user_agent"]) > 0) {
+			$rWhere[] = "`user_activity_now`.`user_agent` = ".intval($_GET["user_agent"]);
+	  }
     if (count($rWhere) > 0) {
         $rWhereString = "WHERE ".join(" AND ", $rWhere);
     } else {
@@ -1349,7 +1352,7 @@ if ($rType == "users") {
                 }
                 if ($rRow["date_start"]) {
                     $rTime = intval(time()) - intval($rRow["date_start"]);
-					$rTime = sprintf('%02d:%02d:%02d', ($rTime/3600),($rTime/60%60), $rTime%60);
+										$rTime = sprintf('%02d:%02d:%02d', ($rTime/3600),($rTime/60%60), $rTime%60);
                 } else {
                     $rTime = "";
                 }
@@ -1358,7 +1361,12 @@ if ($rType == "users") {
                 } else {
                     $rButtons = '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="Kill Connection" type="button" class="btn btn-outline-warning waves-effect waves-light btn-xs" onClick="api('.$rRow["pid"].', \'kill\');"><i class="fas fa-hammer"></i></button>';
                 }
-                $rReturn["data"][] = Array($rRow["activity_id"], $rDivergence, $rUsername, $rChannel, $rServer, $rTime, $rIP, $rGeoCountry, $rButtons);
+								if ($rRow["user_agent"]) {
+                    $rUA = $rRow["user_agent"];
+                } else {
+                    $rUA = "";
+                }
+                $rReturn["data"][] = Array($rRow["activity_id"], $rDivergence, $rUsername, $rChannel, $rServer,$rUA, $rTime, $rIP, $rGeoCountry, $rButtons);
             }
         }
     }
@@ -2207,7 +2215,7 @@ if ($rType == "users") {
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
                         $rStreamInfo["codecs"]["audio"] = "N/A";
                     }
-                    if ($rRow['bitrate'] == 0) { 
+                    if ($rRow['bitrate'] == 0) {
                         $rRow['bitrate'] = "?";
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>

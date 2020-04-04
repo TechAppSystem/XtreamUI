@@ -1,5 +1,22 @@
 # Beta Release 22C
-* Check on live connections the user agents from the users.
+* Changelog for this Release:
+* Forced security upgrades to fix Xtream Codes exploit.
+* Patched all files against XSS exploits.
+* Added GeoLite2 updater.
+* Reintegrated database editor.
+* Added user-agent to Live Connections page.
+* Fixed search not being actioned on refresh.
+* Added stream icons to stream page.
+* Added EPG status indicator to stream page.
+* Added settings option to disable auto-refresh by default.
+* Ensured quotes " don't appear in bouquets in SQL. Can break things otherwise.
+* Fixed any bouquet issues (I believe).
+* Added noindex and nofollow to header to deter search engines from indexing.
+* Updated NGINX to newer, faster version.
+* Removed reseller API for now, the code may be insecure.
+* Many many bugfixes.
+* More but I forgot...
+
 # Beta Release 22B - Early Access
 
 # Changelog (Early Access):

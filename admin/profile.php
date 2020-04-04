@@ -60,7 +60,7 @@ if (isset($_POST["submit_profile"])) {
         $rProfileOptions["16"] = Array("cmd" => "-i \"".$_POST["logo_path"]."\" -filter_complex \"overlay\"", "val" => $_POST["logo_path"]);
     }
     $rArray["profile_options"] = json_encode($rProfileOptions);
-    $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+    $rCols = ESC(implode(',', array_keys($rArray)));
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {
@@ -69,13 +69,13 @@ if (isset($_POST["submit_profile"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     if (isset($_POST["edit"])) {
 		if (!hasPermissions("adv", "edit_tprofile")) { exit; }
         $rCols = "profile_id,".$rCols;
-        $rValues = $_POST["edit"].",".$rValues;
+        $rValues = ESC($_POST["edit"]).",".$rValues;
     }
     $rQuery = "REPLACE INTO `transcoding_profiles`(".$rCols.") VALUES(".$rValues.");";
     if ($db->query($rQuery)) {

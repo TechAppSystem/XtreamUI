@@ -364,8 +364,13 @@ if ($rSettings["sidebar"]) {
             })
             <?php if (!$detect->isMobile()) { ?>
             setTimeout(reloadStreams, 5000);
+            <?php }
+            if (!$rAdminSettings["auto_refresh"]) { ?>
+            toggleAuto();
             <?php } ?>
-            $('#datatable-streampage').DataTable().search($(this).val()).draw();
+            if ($('#movies_search').val().length > 0) {
+                $('#datatable-streampage').DataTable().search($('#movies_search').val()).draw();
+            }
         });
         
         $(window).bind('beforeunload', function() {

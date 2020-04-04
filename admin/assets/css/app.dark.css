@@ -4877,3 +4877,9 @@ body.authentication-bg {
 table.dataTable tbody > tr.reordered, table.dataTable tbody > tr > .reordered {
     background-color: #eeeeee;
 }
+.ellipsis {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}

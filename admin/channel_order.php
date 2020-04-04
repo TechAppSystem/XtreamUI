@@ -19,6 +19,7 @@ $rOrdered = Array("stream" => Array(), "movie" => Array(), "series" => Array(), 
 $result = $db->query("SELECT `id`, `type`, `stream_display_name`, `category_id` FROM `streams` ORDER BY `order` ASC, `stream_display_name` ASC;");
 if (($result) && ($result->num_rows > 0)) {
     while ($row = $result->fetch_assoc()) {
+        $row = XSSRow($row);
         if (($row["type"] == 1) OR ($row["type"] == 3)) {
             $rOrdered["stream"][] = $row;
         } else if ($row["type"] == 2) {

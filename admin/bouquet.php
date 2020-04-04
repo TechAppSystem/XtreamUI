@@ -16,7 +16,7 @@ if (isset($_POST["submit_bouquet"])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+    $rCols = ESC(implode(',', array_keys($rArray)));
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {
@@ -25,13 +25,13 @@ if (isset($_POST["submit_bouquet"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     if (isset($_POST["edit"])) {
 		if (!hasPermissions("adv", "edit_bouquet")) { exit; }
         $rCols = "id,".$rCols;
-        $rValues = $_POST["edit"].",".$rValues;
+        $rValues = ESC($_POST["edit"]).",".$rValues;
     } else if (!hasPermissions("adv", "add_bouquet")) { exit; }
     $rQuery = "REPLACE INTO `bouquets`(".$rCols.") VALUES(".$rValues.");";
     if ($db->query($rQuery)) {

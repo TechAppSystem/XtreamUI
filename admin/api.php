@@ -78,11 +78,11 @@ if (isset($_GET["action"])) {
                     $rUserDetails = getUser($rUserID);
                     if ($rUserDetails) {
                         if ($rUserDetails["is_mag"]) {
-                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".$db->real_escape_string($rUserDetails["username"])."', '".$db->real_escape_string($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete MAG</u>]');");
+                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".ESC($rUserDetails["username"])."', '".ESC($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete MAG</u>]');");
                         } else if ($rUserDetails["is_e2"]) {
-                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".$db->real_escape_string($rUserDetails["username"])."', '".$db->real_escape_string($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Enigma</u>]');");
+                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".ESC($rUserDetails["username"])."', '".ESC($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Enigma</u>]');");
                         } else {
-                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".$db->real_escape_string($rUserDetails["username"])."', '".$db->real_escape_string($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Line</u>]');");
+                            $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".ESC($rUserDetails["username"])."', '".ESC($rUserDetails["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Line</u>]');");
                         }
                     }
                 }
@@ -112,6 +112,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `pid`, `server_id` FROM `user_activity_now` WHERE `user_id` = ".intval($rUserID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     sexec($rRow["server_id"], "kill -9 ".$rRow["pid"]);
                 }
             }
@@ -131,7 +132,7 @@ if (isset($_GET["action"])) {
         if ($rSub == "kill") {
             $rResult = $db->query("SELECT `server_id` FROM `user_activity_now` WHERE `pid` = ".intval($rPID)." LIMIT 1;");
             if (($rResult) && ($rResult->num_rows == 1)) {
-                sexec($rResult->fetch_assoc()["server_id"], "kill -9 ".$rPID);
+                sexec(XSS($rResult->fetch_assoc()["server_id"]), "kill -9 ".$rPID);
                 echo json_encode(Array("result" => True));exit;
             }
         }
@@ -154,12 +155,12 @@ if (isset($_GET["action"])) {
                 if ($rPermissions["is_reseller"]) {
                     $rUserDetails = getRegisteredUser($rUserID);
                     if ($rUserDetails) {
-                        $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".$db->real_escape_string($rUserDetails["username"])."', '', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Subreseller</u>]');");
+                        $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".ESC($rUserDetails["username"])."', '', ".intval(time()).", '[<b>UserPanel</b> -> <u>Delete Subreseller</u>]');");
                     }
                     $rPrevOwner = getRegisteredUser($rUserDetails["owner_id"]);
                     $rCredits = $rUserDetails["credits"];
                     $rNewCredits = $rPrevOwner["credits"] + $rCredits;
-                    $db->query("UPDATE `reg_users` SET `credits` = ".$rNewCredits." WHERE `id` = ".intval($rPrevOwner["id"]).";");
+                    $db->query("UPDATE `reg_users` SET `credits` = ".floatval($rNewCredits)." WHERE `id` = ".intval($rPrevOwner["id"]).";");
                 }
                 $db->query("DELETE FROM `reg_users` WHERE `id` = ".intval($rUserID).";");
                 echo json_encode(Array("result" => True));exit;
@@ -265,6 +266,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `series_episodes` WHERE `series_id` = ".intval($rSeriesID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     $db->query("DELETE FROM `streams_sys` WHERE `stream_id` = ".intval($rRow["stream_id"]).";");
                     $db->query("DELETE FROM `streams` WHERE `id` = ".intval($rRow["stream_id"]).";");
                     deleteMovieFile($rServerID, $rStreamID);
@@ -304,7 +306,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `ip` FROM `blocked_ips` WHERE `id` = ".intval($rIPID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 foreach ($rServers as $rServer) {
-                    sexec($rServer["id"], "sudo /sbin/iptables -D INPUT -s ".$rResult->fetch_assoc()["ip"]." -j DROP");
+                    sexec($rServer["id"], "sudo /sbin/iptables -D INPUT -s ".XSS($rResult->fetch_assoc()["ip"])." -j DROP");
                 }
             }
             $db->query("DELETE FROM `blocked_ips` WHERE `id` = ".intval($rIPID).";");
@@ -378,6 +380,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `pid`, `server_id` FROM `user_activity_now` WHERE `server_id` = ".intval($rServerID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     sexec($rRow["server_id"], "kill -9 ".$rRow["pid"]);
                 }
             }
@@ -387,6 +390,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `streams_sys` WHERE `server_id` = ".intval($rServerID)." AND `on_demand` = 0;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     $rStreamIDs[] = intval($rRow["stream_id"]);
                 }
             }
@@ -399,6 +403,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `streams_sys` WHERE `server_id` = ".intval($rServerID)." AND `on_demand` = 0;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     $rStreamIDs[] = intval($rRow["stream_id"]);
                 }
             }
@@ -417,7 +422,7 @@ if (isset($_GET["action"])) {
             $db->query("DELETE FROM `packages` WHERE `id` = ".intval($rPackageID).";");
             echo json_encode(Array("result" => True));exit;
         } else if (in_array($rSub, Array("is_trial", "is_official", "can_gen_mag", "can_gen_e2", "only_mag", "only_e2"))) {
-            $db->query("UPDATE `packages` SET `".$db->real_escape_string($rSub)."` = ".intval($_GET["value"])." WHERE `id` = ".intval($rPackageID).";");
+            $db->query("UPDATE `packages` SET `".ESC($rSub)."` = ".intval($_GET["value"])." WHERE `id` = ".intval($rPackageID).";");
             echo json_encode(Array("result" => True));exit;
         } else {
             echo json_encode(Array("result" => False));exit;
@@ -430,7 +435,7 @@ if (isset($_GET["action"])) {
             $db->query("DELETE FROM `member_groups` WHERE `group_id` = ".intval($rGroupID)." AND `can_delete` = 1;");
             echo json_encode(Array("result" => True));exit;
         } else if (in_array($rSub, Array("is_banned", "is_admin", "is_reseller"))) {
-            $db->query("UPDATE `member_groups` SET `".$db->real_escape_string($rSub)."` = ".intval($_GET["value"])." WHERE `group_id` = ".intval($rGroupID).";");
+            $db->query("UPDATE `member_groups` SET `".ESC($rSub)."` = ".intval($_GET["value"])." WHERE `group_id` = ".intval($rGroupID).";");
             echo json_encode(Array("result" => True));exit;
         } else {
             echo json_encode(Array("result" => False));exit;
@@ -460,7 +465,7 @@ if (isset($_GET["action"])) {
         $rOverride = json_decode($rUserInfo["override_packages"], True);
         $rResult = $db->query("SELECT `id`, `bouquets`, `official_credits` AS `cost_credits`, `official_duration`, `official_duration_in`, `max_connections`, `can_gen_mag`, `can_gen_e2`, `only_mag`, `only_e2` FROM `packages` WHERE `id` = ".intval($_GET["package_id"]).";");
         if (($rResult) && ($rResult->num_rows == 1)) {
-            $rData = $rResult->fetch_assoc();
+            $rData = XSSRow($rResult->fetch_assoc());
             if ((isset($rOverride[$rData["id"]]["official_credits"])) && (strlen($rOverride[$rData["id"]]["official_credits"]) > 0)) {
                 $rData["cost_credits"] = $rOverride[$rData["id"]]["official_credits"];
             }
@@ -477,7 +482,7 @@ if (isset($_GET["action"])) {
             foreach (json_decode($rData["bouquets"], True) as $rBouquet) {
                 $rResult = $db->query("SELECT * FROM `bouquets` WHERE `id` = ".intval($rBouquet).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rRow = $rResult->fetch_assoc();
+                    $rRow = XSSRow($rResult->fetch_assoc());
                     $rReturn[] = Array("id" => $rRow["id"], "bouquet_name" => $rRow["bouquet_name"], "bouquet_channels" => json_decode($rRow["bouquet_channels"], True), "bouquet_series" => json_decode($rRow["bouquet_series"], True));
                 }
             }
@@ -490,12 +495,12 @@ if (isset($_GET["action"])) {
         $rReturn = Array();
         $rResult = $db->query("SELECT `bouquets`, `trial_credits` AS `cost_credits`, `trial_duration`, `trial_duration_in`, `max_connections`, `can_gen_mag`, `can_gen_e2`, `only_mag`, `only_e2` FROM `packages` WHERE `id` = ".intval($_GET["package_id"]).";");
         if (($rResult) && ($rResult->num_rows == 1)) {
-            $rData = $rResult->fetch_assoc();
+            $rData = XSSRow($rResult->fetch_assoc());
             $rData["exp_date"] = date('Y-m-d', strtotime('+'.intval($rData["trial_duration"]).' '.$rData["trial_duration_in"]));
             foreach (json_decode($rData["bouquets"], True) as $rBouquet) {
                 $rResult = $db->query("SELECT * FROM `bouquets` WHERE `id` = ".intval($rBouquet).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rRow = $rResult->fetch_assoc();
+                    $rRow = XSSRow($rResult->fetch_assoc());
                     $rReturn[] = Array("id" => $rRow["id"], "bouquet_name" => $rRow["bouquet_name"], "bouquet_channels" => json_decode($rRow["bouquet_channels"], True), "bouquet_series" => json_decode($rRow["bouquet_series"], True));
                 }
             }
@@ -520,6 +525,7 @@ if (isset($_GET["action"])) {
 		$rResult = $db->query("SELECT `type`, `time`, `count` FROM `dashboard_statistics` WHERE `time` >= ".intval($rMin)." AND `time` <= ".intval($rMax)." AND `type` = 'conns';");
 		if (($rResult) && ($rResult->num_rows > 0)) {
 			while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				$rStatistics[$rRow["type"]][] = Array(intval($rRow["time"]) * 1000, intval($rRow["count"]));
 			}
 		}
@@ -598,11 +604,11 @@ if (isset($_GET["action"])) {
     } else if ($_GET["action"] == "reseller_dashboard") {
         if ($rPermissions["is_admin"]) { echo json_encode(Array("result" => False)); exit; }
         $return = Array("open_connections" => 0, "online_users" => 0, "active_accounts" => 0, "credits" => 0);
-        $result = $db->query("SELECT `activity_id` FROM `user_activity_now` AS `a` LEFT JOIN `users` AS `u` ON `a`.`user_id` = `u`.`id` WHERE `u`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).");");
+        $result = $db->query("SELECT `activity_id` FROM `user_activity_now` AS `a` LEFT JOIN `users` AS `u` ON `a`.`user_id` = `u`.`id` WHERE `u`.`member_id` IN (".ESC(join(",", array_keys(getRegisteredUsers($rUserInfo["id"])))).");");
         $return["open_connections"] = $result->num_rows;
-        $result = $db->query("SELECT `activity_id` FROM `user_activity_now` AS `a` LEFT JOIN `users` AS `u` ON `a`.`user_id` = `u`.`id` WHERE `u`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).") GROUP BY `a`.`user_id`;");
+        $result = $db->query("SELECT `activity_id` FROM `user_activity_now` AS `a` LEFT JOIN `users` AS `u` ON `a`.`user_id` = `u`.`id` WHERE `u`.`member_id` IN (".ESC(join(",", array_keys(getRegisteredUsers($rUserInfo["id"])))).") GROUP BY `a`.`user_id`;");
         $return["online_users"] = $result->num_rows;
-        $result = $db->query("SELECT `id` FROM `users` WHERE `member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).");");
+        $result = $db->query("SELECT `id` FROM `users` WHERE `member_id` IN (".ESC(join(",", array_keys(getRegisteredUsers($rUserInfo["id"])))).");");
         $return["active_accounts"] = $result->num_rows;
         $return["credits"] = $rUserInfo["credits"];
         echo json_encode($return);exit;
@@ -613,7 +619,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"] as $rStreamID) {
                 $rResult = $db->query("SELECT `id`, `stream_display_name`, `stream_source` FROM `streams` WHERE `id` = ".intval($rStreamID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = $rResult->fetch_assoc();
+                    $rData = XSSRow($rResult->fetch_assoc());
                     $return["streams"][] = $rData;
                 }
             }
@@ -626,7 +632,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"]["stream"] as $rStreamID) {
                 $rResult = $db->query("SELECT `id`, `stream_display_name`, `type` FROM `streams` WHERE `id` = ".intval($rStreamID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = $rResult->fetch_assoc();
+                    $rData = XSSRow($rResult->fetch_assoc());
                     if ($rData["type"] == 2) {
                         $return["vod"][] = $rData;
                     } else if ($rData["type"] == 4) {
@@ -641,7 +647,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"]["series"] as $rSeriesID) {
                 $rResult = $db->query("SELECT `id`, `title` FROM `series` WHERE `id` = ".intval($rSeriesID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = $rResult->fetch_assoc();
+                    $rData = XSSRow($rResult->fetch_assoc());
                     $return["series"][] = $rData;
                 }
             }
@@ -656,11 +662,12 @@ if (isset($_GET["action"])) {
             } else {
                 $rPage = 1;
             }
-            $rResult = $db->query("SELECT COUNT(`id`) AS `id` FROM `users` WHERE `username` LIKE '%".$db->real_escape_string($_GET["search"])."%' AND `is_e2` = 0 AND `is_mag` = 0;");
+            $rResult = $db->query("SELECT COUNT(`id`) AS `id` FROM `users` WHERE `username` LIKE '%".ESC($_GET["search"])."%' AND `is_e2` = 0 AND `is_mag` = 0;");
             $return["total_count"] = $rResult->fetch_assoc()["id"];
-            $rResult = $db->query("SELECT `id`, `username` FROM `users` WHERE `username` LIKE '%".$db->real_escape_string($_GET["search"])."%' AND `is_e2` = 0 AND `is_mag` = 0 ORDER BY `username` ASC LIMIT ".(($rPage-1) * 100).", 100;");
+            $rResult = $db->query("SELECT `id`, `username` FROM `users` WHERE `username` LIKE '%".ESC($_GET["search"])."%' AND `is_e2` = 0 AND `is_mag` = 0 ORDER BY `username` ASC LIMIT ".(($rPage-1) * 100).", 100;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     $return["items"][] = Array("id" => $rRow["id"], "text" => $rRow["username"]);
                 }
             }
@@ -675,11 +682,12 @@ if (isset($_GET["action"])) {
             } else {
                 $rPage = 1;
             }
-            $rResult = $db->query("SELECT COUNT(`id`) AS `id` FROM `streams` WHERE `stream_display_name` LIKE '%".$db->real_escape_string($_GET["search"])."%';");
+            $rResult = $db->query("SELECT COUNT(`id`) AS `id` FROM `streams` WHERE `stream_display_name` LIKE '%".ESC($_GET["search"])."%';");
             $return["total_count"] = $rResult->fetch_assoc()["id"];
-            $rResult = $db->query("SELECT `id`, `stream_display_name` FROM `streams` WHERE `stream_display_name` LIKE '%".$db->real_escape_string($_GET["search"])."%' ORDER BY `stream_display_name` ASC LIMIT ".(($rPage-1) * 100).", 100;");
+            $rResult = $db->query("SELECT `id`, `stream_display_name` FROM `streams` WHERE `stream_display_name` LIKE '%".ESC($_GET["search"])."%' ORDER BY `stream_display_name` ASC LIMIT ".(($rPage-1) * 100).", 100;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
+                    $rRow = XSSRow($rRow);
                     $return["items"][] = Array("id" => $rRow["id"], "text" => $rRow["stream_display_name"]);
                 }
             }
@@ -779,6 +787,7 @@ if (isset($_GET["action"])) {
                 ini_set('max_execution_time', 360);
                 ini_set('default_socket_timeout', 15);
                 while ($row = $result->fetch_assoc()) {
+                    $row = XSSRow($row);
                     if (in_array($row["server_id"], $rActiveServers)) {
                         $rArray = Array("font_size" => $rData["font_size"], "font_color" => $rData["font_color"], "xy_offset" => $rData["xy_offset"], "message" => "", "activity_id" => $row["activity_id"]);
                         if ($rData["type"] == 1) {
@@ -800,17 +809,6 @@ if (isset($_GET["action"])) {
         if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "edit_server"))) { echo json_encode(Array("result" => False)); exit; }
         $rServerID = intval($_GET["server_id"]);
         if (isset($rServers[$rServerID])) {
-			$rServer = $rServers[$rServerID];
-            $rJSON = Array("status" => 0, "port" => intval($_GET["ssh_port"]), "host" => $rServer["server_ip"], "password" => $_GET["password"], "time" => intval(time()), "id" => $rServerID, "type" => "restart");
-            file_put_contents("/home/xtreamcodes/iptv_xtream_codes/adtools/balancer/".$rServerID.".json", json_encode($rJSON));
-            echo json_encode(Array("result" => True));exit;
-        }
-        echo json_encode(Array("result" => False));exit;
-	} else if ($_GET["action"] == "reboot_server") {
-        if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "edit_server"))) { echo json_encode(Array("result" => False)); exit; }
-        $rServerID = intval($_GET["server_id"]);
-        if (isset($rServers[$rServerID])) {
-			$rServer = $rServers[$rServerID];
             $rJSON = Array("status" => 0, "port" => intval($_GET["ssh_port"]), "host" => $rServer["server_ip"], "password" => $_GET["password"], "time" => intval(time()), "id" => $rServerID, "type" => "reboot");
             file_put_contents("/home/xtreamcodes/iptv_xtream_codes/adtools/balancer/".$rServerID.".json", json_encode($rJSON));
             echo json_encode(Array("result" => True));exit;
@@ -841,13 +839,13 @@ if (isset($_GET["action"])) {
                 $rColumn = "date";
             }
             if (($rStartTime) && ($rEndTime)) {
-                $db->query("DELETE FROM `".$db->real_escape_string($_GET["type"])."` WHERE `".$rColumn."` >= ".intval($rStartTime)." AND `".$rColumn."` <= ".intval($rEndTime).";");
+                $db->query("DELETE FROM `".ESC($_GET["type"])."` WHERE `".$rColumn."` >= ".intval($rStartTime)." AND `".$rColumn."` <= ".intval($rEndTime).";");
             } else if ($rStartTime) {
-                $db->query("DELETE FROM `".$db->real_escape_string($_GET["type"])."` WHERE `".$rColumn."` >= ".intval($rStartTime).";");
+                $db->query("DELETE FROM `".ESC($_GET["type"])."` WHERE `".$rColumn."` >= ".intval($rStartTime).";");
             } else if ($rEndTime) {
-                $db->query("DELETE FROM `".$db->real_escape_string($_GET["type"])."` WHERE `".$rColumn."` <= ".intval($rEndTime).";");
+                $db->query("DELETE FROM `".ESC($_GET["type"])."` WHERE `".$rColumn."` <= ".intval($rEndTime).";");
             } else {
-                $db->query("DELETE FROM `".$db->real_escape_string($_GET["type"])."`;");
+                $db->query("DELETE FROM `".ESC($_GET["type"])."`;");
             }
         } else if ($_GET["type"] == "watch_output") {
             if (($rStartTime) && ($rEndTime)) {
@@ -878,7 +876,7 @@ if (isset($_GET["action"])) {
             echo json_encode(Array("result" => True));exit;
         } else if ($rSub == "backup") {
             $rFilename = MAIN_DIR."adtools/backups/backup_".date("Y-m-d_H:i:s").".sql";
-            $rCommand = "mysqldump -u ".$_INFO["db_user"]." -p".$_INFO["db_pass"]." -P ".$_INFO["db_port"]." ".$_INFO["db_name"]." > \"".$rFilename."\"";
+            $rCommand = "mysqldump -u ".$_INFO["db_user"]." -p".$_INFO["db_pass"]." -P ".$_INFO["db_port"]." ".$_INFO["db_name"]." --ignore-table=xtream_iptvpro.user_activity --ignore-table=xtream_iptvpro.stream_logs --ignore-table=xtream_iptvpro.panel_logs --ignore-table=xtream_iptvpro.client_logs --ignore-table=xtream_iptvpro.epg_data > \"".$rFilename."\"";
             $rRet = shell_exec($rCommand);
             if (file_exists($rFilename)) {
                 echo json_encode(Array("result" => True, "data" => Array("filename" => pathinfo($rFilename)["filename"].".sql", "timestamp" => filemtime($rFilename), "date" => date("Y-m-d H:i:s", filemtime($rFilename)))));exit;
@@ -902,7 +900,7 @@ if (isset($_GET["action"])) {
                 $rData["reboot_portal"] = 0;
                 $rData["message"] = "";
             }
-            if ($db->query("INSERT INTO `mag_events`(`status`, `mag_device_id`, `event`, `need_confirm`, `msg`, `reboot_after_ok`, `send_time`) VALUES (0, ".intval($rData["id"]).", '".$db->real_escape_string($rData["type"])."', ".intval($rData["need_confirm"]).", '".$db->real_escape_string($rData["message"])."', ".intval($rData["reboot_portal"]).", ".intval(time()).");")) {
+            if ($db->query("INSERT INTO `mag_events`(`status`, `mag_device_id`, `event`, `need_confirm`, `msg`, `reboot_after_ok`, `send_time`) VALUES (0, ".intval($rData["id"]).", '".ESC($rData["type"])."', ".intval($rData["need_confirm"]).", '".ESC($rData["message"])."', ".intval($rData["reboot_portal"]).", ".intval(time()).");")) {
                 echo json_encode(Array("result" => True));exit;
             }
         }

@@ -19,7 +19,7 @@ if (isset($_POST["submit_user"])) {
         if ($rUserInfo["credits"] - $rCost < 0) {
             $_STATUS = 3;
         }
-        $result = $db->query("SELECT `id` FROM `reg_users` WHERE `username` = '".$db->real_escape_string($_POST["username"])."';");
+        $result = $db->query("SELECT `id` FROM `reg_users` WHERE `username` = '".ESC($_POST["username"])."';");
         if (($result) && ($result->num_rows > 0)) {
             $_STATUS = 4;
         }
@@ -46,7 +46,7 @@ if (isset($_POST["submit_user"])) {
         if (isset($_POST["notes"])) {
             $rArray["notes"] = $_POST["notes"];
         }
-        $rCols = $db->real_escape_string("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -55,12 +55,12 @@ if (isset($_POST["submit_user"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `reg_users`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
@@ -70,9 +70,9 @@ if (isset($_POST["submit_user"])) {
                 $rInsertID = $db->insert_id;
             }
             if (isset($rCost)) {
-                $rNewCredits = intval($rUserInfo["credits"]) - $rCost;
-                $db->query("UPDATE `reg_users` SET `credits` = ".$rNewCredits." WHERE `id` = ".intval($rUserInfo["id"]).";");
-                $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".$db->real_escape_string($rArray["username"])."', '".$db->real_escape_string($rArray["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>New Subreseller</u>] Credits: <font color=\"green\">".$rUserInfo["credits"]."</font> -> <font color=\"red\">".$rNewCredits."</font>');");
+                $rNewCredits = floatval($rUserInfo["credits"]) - $rCost;
+                $db->query("UPDATE `reg_users` SET `credits` = ".floatval($rNewCredits)." WHERE `id` = ".intval($rUserInfo["id"]).";");
+                $db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '".ESC($rArray["username"])."', '".ESC($rArray["password"])."', ".intval(time()).", '[<b>UserPanel</b> -> <u>New Subreseller</u>] Credits: <font color=\"green\">".floatval($rUserInfo["credits"])."</font> -> <font color=\"red\">".$rNewCredits."</font>');");
                 $rUserInfo["credits"] = $rNewCredits;
             }
             header("Location: ./subreseller.php?id=".$rInsertID); exit;

@@ -4,7 +4,7 @@ if (isset($_SESSION['hash'])) { header("Location: ./dashboard.php"); exit; }
 
 $rAdminSettings = getAdminSettings();
 if (intval($rAdminSettings["login_flood"]) > 0) {
-	$result = $db->query("SELECT COUNT(`id`) AS `count` FROM `login_flood` WHERE `ip` = '".$db->real_escape_string(getIP())."' AND TIME_TO_SEC(TIMEDIFF(NOW(), `dateadded`)) <= 86400;");
+	$result = $db->query("SELECT COUNT(`id`) AS `count` FROM `login_flood` WHERE `ip` = '".ESC(getIP())."' AND TIME_TO_SEC(TIMEDIFF(NOW(), `dateadded`)) <= 86400;");
 	if (($result) && ($result->num_rows == 1)) {
 		if (intval($result->fetch_assoc()["count"]) >= intval($rAdminSettings["login_flood"])) {
 			$_STATUS = 7;
@@ -29,7 +29,7 @@ if (!isset($_STATUS)) {
 						$rGA = new PHPGangsta_GoogleAuthenticator();
 						$rSecret = $rGA->createSecret();
 						$rUserInfo["google_2fa_sec"] = $rSecret;
-						$db->query("UPDATE `reg_users` SET `google_2fa_sec` = '".$db->real_escape_string($rSecret)."' WHERE `id` = ".intval($rUserInfo["id"]).";");
+						$db->query("UPDATE `reg_users` SET `google_2fa_sec` = '".ESC($rSecret)."' WHERE `id` = ".intval($rUserInfo["id"]).";");
 						$rNew2F = true;
 					}
 					$rQR = $rGA->getQRCodeGoogleUrl('Xtream UI', $rUserInfo["google_2fa_sec"]);
@@ -38,7 +38,7 @@ if (!isset($_STATUS)) {
 				} else {
 					$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 					if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
-						$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `ip` = '".$db->real_escape_string(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
+						$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `ip` = '".ESC(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
 						$_SESSION['hash'] = md5($rUserInfo["username"]);
 						$_SESSION['ip'] = getIP();
 						if ($rPermissions["is_admin"]) {
@@ -65,7 +65,7 @@ if (!isset($_STATUS)) {
 				}
 			} else {
 				if (intval($rAdminSettings["login_flood"]) > 0) {
-					$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".$db->real_escape_string($_POST["username"])."', '".$db->real_escape_string(getIP())."');");
+					$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".ESC($_POST["username"])."', '".ESC(getIP())."');");
 				}
 				$_STATUS = 0;
 			}
@@ -76,7 +76,7 @@ if (!isset($_STATUS)) {
 			if ($rGA->verifyCode($rUserInfo["google_2fa_sec"], $_POST["gauth"], 2)) {
 				$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 				if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
-					$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `ip` = '".$db->real_escape_string(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
+					$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `ip` = '".ESC(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
 					$_SESSION['hash'] = md5($rUserInfo["username"]);
 					$_SESSION['ip'] = getIP();
 					if ($rPermissions["is_admin"]) {
@@ -98,7 +98,7 @@ if (!isset($_STATUS)) {
 			}
 		} else {
 			if (intval($rAdminSettings["login_flood"]) > 0) {
-				$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".$db->real_escape_string($_POST["username"])."', '".$db->real_escape_string(getIP())."');");
+				$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".ESC($_POST["username"])."', '".ESC(getIP())."');");
 			}
 			$_STATUS = 0;
 		}
@@ -109,7 +109,7 @@ if (!isset($_STATUS)) {
 			if (($_POST["newpass"] == $_POST["confirm"]) && (strlen($_POST["newpass"]) >= intval($rAdminSettings["pass_length"]))) {
 				$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 				if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
-					$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `password` = '".$db->real_escape_string(cryptPassword($_POST["newpass"]))."', `ip` = '".$db->real_escape_string(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
+					$db->query("UPDATE `reg_users` SET `last_login` = UNIX_TIMESTAMP(), `password` = '".ESC(cryptPassword($_POST["newpass"]))."', `ip` = '".ESC(getIP())."' WHERE `id` = ".intval($rUserInfo["id"]).";");
 					$_SESSION['hash'] = md5($rUserInfo["username"]);
 					$_SESSION['ip'] = getIP();
 					if ($rPermissions["is_admin"]) {
@@ -130,7 +130,7 @@ if (!isset($_STATUS)) {
 			}
 		} else {
 			if (intval($rAdminSettings["login_flood"]) > 0) {
-				$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".$db->real_escape_string($_POST["username"])."', '".$db->real_escape_string(getIP())."');");
+				$db->query("INSERT INTO `login_flood`(`username`, `ip`) VALUES('".ESC($_POST["username"])."', '".ESC(getIP())."');");
 			}
 			$_STATUS = 0;
 		}

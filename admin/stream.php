@@ -132,6 +132,7 @@ if (isset($_POST["submit_stream"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` IN (1,3);");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
+                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = str_replace(" ", "%20", $rSource);
@@ -186,7 +187,7 @@ if (isset($_POST["submit_stream"])) {
 		if (isset($_POST["edit"])) {
 			$rImportStreams[] = $rImportArray;
 		} else {
-			$rResult = $db->query("SELECT COUNT(`id`) AS `count` FROM `streams` WHERE `stream_display_name` = '".$db->real_escape_string($rImportArray["stream_display_name"])."' AND `type` IN (1,3);");
+			$rResult = $db->query("SELECT COUNT(`id`) AS `count` FROM `streams` WHERE `stream_display_name` = '".ESC($rImportArray["stream_display_name"])."' AND `type` IN (1,3);");
 			if ($rResult->fetch_assoc()["count"] == 0) {
 				$rImportStreams[] = $rImportArray;
 			} else {
@@ -205,7 +206,7 @@ if (isset($_POST["submit_stream"])) {
 				$rImportArray[$rKey] = $rImportStream[$rKey];
             }
             $rImportArray["order"] = getNextOrder();
-            $rCols = $db->real_escape_string("`".implode('`,`', array_keys($rImportArray))."`");
+            $rCols = ESC("`".implode('`,`', array_keys($rImportArray))."`");
             $rValues = null;
             foreach (array_values($rImportArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -215,12 +216,12 @@ if (isset($_POST["submit_stream"])) {
                 if (is_null($rValue)) {
                     $rValues .= 'NULL';
                 } else {
-                    $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                    $rValues .= '\''.ESC($rValue).'\'';
                 }
             }
             if (isset($_POST["edit"])) {
                 $rCols = "`id`,".$rCols;
-                $rValues = $_POST["edit"].",".$rValues;
+                $rValues = ESC($_POST["edit"]).",".$rValues;
             }
             $rQuery = "REPLACE INTO `streams`(".$rCols.") VALUES(".$rValues.");";
             if ($db->query($rQuery)) {
@@ -236,6 +237,7 @@ if (isset($_POST["submit_stream"])) {
                     $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                     if (($result) && ($result->num_rows > 0)) {
                         while ($row = $result->fetch_assoc()) {
+                            $row = XSSRow($row);
                             $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                         }
                     }
@@ -273,16 +275,16 @@ if (isset($_POST["submit_stream"])) {
                 }
                 $db->query("DELETE FROM `streams_options` WHERE `stream_id` = ".intval($rInsertID).";");
                 if ((isset($_POST["user_agent"])) && (strlen($_POST["user_agent"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 1, '".$db->real_escape_string($_POST["user_agent"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 1, '".ESC($_POST["user_agent"])."');");
                 }
                 if ((isset($_POST["http_proxy"])) && (strlen($_POST["http_proxy"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 2, '".$db->real_escape_string($_POST["http_proxy"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 2, '".ESC($_POST["http_proxy"])."');");
                 }
 				if ((isset($_POST["cookie"])) && (strlen($_POST["cookie"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 17, '".$db->real_escape_string($_POST["cookie"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 17, '".ESC($_POST["cookie"])."');");
                 }
 				if ((isset($_POST["headers"])) && (strlen($_POST["headers"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 19, '".$db->real_escape_string($_POST["headers"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rInsertID).", 19, '".ESC($_POST["headers"])."');");
                 }
 				if ($rRestart) {
 					APIRequest(Array("action" => "stream", "sub" => "start", "stream_ids" => Array($rInsertID)));

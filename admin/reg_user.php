@@ -46,7 +46,7 @@ if (isset($_POST["submit_user"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = $db->real_escape_string("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -55,12 +55,12 @@ if (isset($_POST["submit_user"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `reg_users`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
@@ -70,7 +70,7 @@ if (isset($_POST["submit_user"])) {
                 $rInsertID = $db->insert_id;
             }
             if (isset($rCreditsAdjustment)) {
-                $db->query("INSERT INTO `credits_log`(`target_id`, `admin_id`, `amount`, `date`, `reason`) VALUES(".$rInsertID.", ".intval($rUserInfo["id"]).", ".$db->real_escape_string($rCreditsAdjustment).", ".intval(time()).", '".$db->real_escape_string($rReason)."');");
+                $db->query("INSERT INTO `credits_log`(`target_id`, `admin_id`, `amount`, `date`, `reason`) VALUES(".$rInsertID.", ".intval($rUserInfo["id"]).", ".ESC($rCreditsAdjustment).", ".intval(time()).", '".ESC($rReason)."');");
             }
             header("Location: ./reg_user.php?id=".$rInsertID); exit;
         } else {

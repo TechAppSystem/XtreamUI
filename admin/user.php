@@ -26,7 +26,7 @@ if (isset($_POST["submit_user"])) {
         $_POST["password"] = generateString(10);
     }
     if (!isset($_POST["edit"])) {
-        $result = $db->query("SELECT `id` FROM `users` WHERE `username` = '".$db->real_escape_string($_POST["username"])."';");
+        $result = $db->query("SELECT `id` FROM `users` WHERE `username` = '".ESC($_POST["username"])."';");
         if (($result) && ($result->num_rows > 0)) {
             $_STATUS = 3; // Username in use.
         }
@@ -34,7 +34,7 @@ if (isset($_POST["submit_user"])) {
     if ((($_POST["is_mag"]) && (!filter_var($_POST["mac_address_mag"], FILTER_VALIDATE_MAC))) OR ((strlen($_POST["mac_address_e2"]) > 0) && (!filter_var($_POST["mac_address_e2"], FILTER_VALIDATE_MAC)))) {
         $_STATUS = 4;
     } else if ($_POST["is_mag"]) {
-        $result = $db->query("SELECT `user_id` FROM `mag_devices` WHERE mac = '".$db->real_escape_string(base64_encode($_POST["mac_address_mag"]))."' LIMIT 1;");
+        $result = $db->query("SELECT `user_id` FROM `mag_devices` WHERE mac = '".ESC(base64_encode($_POST["mac_address_mag"]))."' LIMIT 1;");
         if (($result) && ($result->num_rows > 0)) {
             if (isset($_POST["edit"])) {
                 if (intval($result->fetch_assoc()["user_id"]) <> intval($_POST["edit"])) {
@@ -45,7 +45,7 @@ if (isset($_POST["submit_user"])) {
             }
         }
     } else if ($_POST["is_e2"]) {
-        $result = $db->query("SELECT `user_id` FROM `enigma2_devices` WHERE mac = '".$db->real_escape_string($_POST["mac_address_e2"])."' LIMIT 1;");
+        $result = $db->query("SELECT `user_id` FROM `enigma2_devices` WHERE mac = '".ESC($_POST["mac_address_e2"])."' LIMIT 1;");
         if (($result) && ($result->num_rows > 0)) {
             if (isset($_POST["edit"])) {
                 if (intval($result->fetch_assoc()["user_id"]) <> intval($_POST["edit"])) {
@@ -78,6 +78,7 @@ if (isset($_POST["submit_user"])) {
     usort($rArray["bouquet"], function ($u1, $u2)  use ($rOrderKeys) {
         return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
     });
+    $rArray["bouquet"] = "[".join(",", $rArray["bouquet"])."]";
     unset($_POST["bouquets_selected"]);
     if ((isset($_POST["exp_date"])) && (!isset($_POST["no_expire"]))) {
         if ((strlen($_POST["exp_date"]) > 0) AND ($_POST["exp_date"] <> "1970-01-01")) {
@@ -119,7 +120,7 @@ if (isset($_POST["submit_user"])) {
             $rArray["member_id"] = -1;
         }
         $rArray["created_by"] = $rArray["member_id"];
-        $rCols = $db->real_escape_string("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -128,12 +129,12 @@ if (isset($_POST["submit_user"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `users`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
@@ -151,9 +152,9 @@ if (isset($_POST["submit_user"])) {
 					if (hasPermissions("adv", "add_mag")) {
 						$result = $db->query("SELECT `mag_id` FROM `mag_devices` WHERE `user_id` = ".intval($rInsertID)." LIMIT 1;");
 						if ((isset($result)) && ($result->num_rows == 1)) {
-							$db->query("UPDATE `mag_devices` SET `mac` = '".base64_encode($db->real_escape_string($_POST["mac_address_mag"]))."' WHERE `user_id` = ".intval($rInsertID).";");
+							$db->query("UPDATE `mag_devices` SET `mac` = '".base64_encode(ESC($_POST["mac_address_mag"]))."' WHERE `user_id` = ".intval($rInsertID).";");
 						} else {
-							$db->query("INSERT INTO `mag_devices`(`user_id`, `mac`) VALUES(".intval($rInsertID).", '".$db->real_escape_string(base64_encode($_POST["mac_address_mag"]))."');");
+							$db->query("INSERT INTO `mag_devices`(`user_id`, `mac`) VALUES(".intval($rInsertID).", '".ESC(base64_encode($_POST["mac_address_mag"]))."');");
 						}
 						if (isset($_POST["edit"])) {
 							$db->query("DELETE FROM `enigma2_devices` WHERE `user_id` = ".intval($rInsertID).";");
@@ -163,9 +164,9 @@ if (isset($_POST["submit_user"])) {
 					if (hasPermissions("adv", "add_e2")) {
 						$result = $db->query("SELECT `device_id` FROM `enigma2_devices` WHERE `user_id` = ".intval($rInsertID)." LIMIT 1;");
 						if ((isset($result)) && ($result->num_rows == 1)) {
-							$db->query("UPDATE `enigma2_devices` SET `mac` = '".$db->real_escape_string($_POST["mac_address_e2"])."' WHERE `user_id` = ".intval($rInsertID).";");
+							$db->query("UPDATE `enigma2_devices` SET `mac` = '".ESC($_POST["mac_address_e2"])."' WHERE `user_id` = ".intval($rInsertID).";");
 						} else {
-							$db->query("INSERT INTO `enigma2_devices`(`user_id`, `mac`) VALUES(".intval($rInsertID).", '".$db->real_escape_string($_POST["mac_address_e2"])."');");
+							$db->query("INSERT INTO `enigma2_devices`(`user_id`, `mac`) VALUES(".intval($rInsertID).", '".ESC($_POST["mac_address_e2"])."');");
 						}
 						if (isset($_POST["edit"])) {
 							$db->query("DELETE FROM `mag_devices` WHERE `user_id` = ".intval($rInsertID).";");
@@ -472,7 +473,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ips">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select class="form-control" id="allowed_ips" name="allowed_ips[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select id="allowed_ips" name="allowed_ips[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ips"], True) as $rIP) { ?>
                                                                 <option value="<?=$rIP?>"><?=$rIP?></option>
                                                                 <?php } } ?>
@@ -492,7 +493,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ua">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select class="form-control" id="allowed_ua" name="allowed_ua[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select id="allowed_ua" name="allowed_ua[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ua"], True) as $rUA) { ?>
                                                                 <option value="<?=$rUA?>"><?=$rUA?></option>
                                                                 <?php } } ?>

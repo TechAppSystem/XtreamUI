@@ -31,7 +31,7 @@ if (isset($_POST["submit_series"])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = "`".implode('`,`', array_keys($rArray))."`";
+    $rCols = ESC(implode(',', array_keys($rArray)));
     $rValues = null;
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -41,14 +41,14 @@ if (isset($_POST["submit_series"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     if (isset($_POST["edit"])) {
         $rCols = "`id`,".$rCols;
-        $rValues = $_POST["edit"].",".$rValues;
+        $rValues = ESC($_POST["edit"]).",".$rValues;
     }
-    $rQuery = "REPLACE INTO `series`(".$db->real_escape_string($rCols).") VALUES(".$rValues.");";
+    $rQuery = "REPLACE INTO `series`(".$rCols.") VALUES(".$rValues.");";
     if ($db->query($rQuery)) {
         if (isset($_POST["edit"])) {
             $rInsertID = intval($_POST["edit"]);

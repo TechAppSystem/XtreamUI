@@ -34,7 +34,7 @@ if ($rType == "users") {
 		}
 	}
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR `users`.`password` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`max_connections` LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -78,6 +78,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -199,7 +200,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR from_base64(`mag_devices`.`mac`) LIKE '%".strtoupper($rSearch)."%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -241,6 +242,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -350,7 +352,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR `enigma2_devices`.`mac` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -392,6 +394,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -500,7 +503,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+            $rSearch = ESC($_GET["search"]["value"]);
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -546,10 +549,11 @@ if ($rType == "users") {
     }
     $rReturn["recordsFiltered"] = $rReturn["recordsTotal"];
     if ($rReturn["recordsTotal"] > 0) {
-        $rQuery = "SELECT `streams`.`id`, `streams`.`type`, `streams`.`cchannel_rsources`, `streams`.`stream_source`, `streams`.`stream_display_name`, `streams`.`tv_archive_duration`, `streams_sys`.`server_id`, `streams`.`notes`, `streams`.`direct_source`, `streams_sys`.`pid`, `streams_sys`.`monitor_pid`, `streams_sys`.`stream_status`, `streams_sys`.`stream_started`, `streams_sys`.`stream_info`, `streams_sys`.`current_source`, `streams_sys`.`bitrate`, `streams_sys`.`progress_info`, `streams_sys`.`on_demand`, `stream_categories`.`category_name`, `streaming_servers`.`server_name`, (SELECT COUNT(*) FROM `user_activity_now` WHERE `user_activity_now`.`server_id` = `streams_sys`.`server_id` AND `user_activity_now`.`stream_id` = `streams`.`id`) AS `clients` FROM `streams` LEFT JOIN `streams_sys` ON `streams_sys`.`stream_id` = `streams`.`id` LEFT JOIN `stream_categories` ON `stream_categories`.`id` = `streams`.`category_id` LEFT JOIN `streaming_servers` ON `streaming_servers`.`id` = `streams_sys`.`server_id` {$rWhereString} {$rOrderBy} LIMIT {$rStart}, {$rLimit};";
+        $rQuery = "SELECT (SELECT COUNT(`id`) FROM `epg_data` WHERE `epg_data`.`epg_id` = `streams`.`epg_id` AND `epg_data`.`channel_id` = `streams`.`channel_id`) AS `count_epg`, `streams`.`id`, `streams`.`type`, `streams`.`stream_icon`, `streams`.`cchannel_rsources`, `streams`.`stream_source`, `streams`.`stream_display_name`, `streams`.`tv_archive_duration`, `streams_sys`.`server_id`, `streams`.`notes`, `streams`.`direct_source`, `streams_sys`.`pid`, `streams_sys`.`monitor_pid`, `streams_sys`.`stream_status`, `streams_sys`.`stream_started`, `streams_sys`.`stream_info`, `streams_sys`.`current_source`, `streams_sys`.`bitrate`, `streams_sys`.`progress_info`, `streams_sys`.`on_demand`, `stream_categories`.`category_name`, `streaming_servers`.`server_name`, (SELECT COUNT(*) FROM `user_activity_now` WHERE `user_activity_now`.`server_id` = `streams_sys`.`server_id` AND `user_activity_now`.`stream_id` = `streams`.`id`) AS `clients` FROM `streams` LEFT JOIN `streams_sys` ON `streams_sys`.`stream_id` = `streams`.`id` LEFT JOIN `stream_categories` ON `stream_categories`.`id` = `streams`.`category_id` LEFT JOIN `streaming_servers` ON `streaming_servers`.`id` = `streams_sys`.`server_id` {$rWhereString} {$rOrderBy} LIMIT {$rStart}, {$rLimit};";
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -670,12 +674,12 @@ if ($rType == "users") {
                 $rProgressInfo = json_decode($rRow["progress_info"], True);
                 if ($rActualStatus == 1) {
                     if (!isset($rStreamInfo["codecs"]["video"])) {
-                        $rStreamInfo["codecs"]["video"] = "N/A";
+                        $rStreamInfo["codecs"]["video"] = Array("width" => "?", "height" => "?", "codec_name" => "N/A", "r_frame_rate" => "--");
                     }
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
-                        $rStreamInfo["codecs"]["audio"] = "N/A";
+                        $rStreamInfo["codecs"]["audio"] = Array("codec_name" => "N/A");
                     }
-                    if ($rRow['bitrate'] == 0) {
+                    if ($rRow['bitrate'] == 0) { 
                         $rRow['bitrate'] = "?";
                     }
                     if (isset($rProgressInfo["speed"])) {
@@ -686,7 +690,11 @@ if ($rType == "users") {
                     if (isset($rProgressInfo["fps"])) {
                         $rFPS = intval($rProgressInfo["fps"])." FPS";
                     } else {
-                        $rFPS = "--";
+						if (isset($rStreamInfo["codecs"]["video"]["r_frame_rate"])) {
+							$rFPS = intval($rStreamInfo["codecs"]["video"]["r_frame_rate"])." FPS";
+						} else {
+							$rFPS = "--";
+						}
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>
                         <tbody>
@@ -707,10 +715,22 @@ if ($rType == "users") {
                         </tbody>
                     </table>";
                 }
-                if ($rPermissions["is_admin"]) {
-                    $rReturn["data"][] = Array($rRow["id"], $rStreamName, $rServerName, $rClients, $rUptime, $rButtons, $rPlayer, $rStreamInfoText);
+                if ($rRow["count_epg"] > 0) {
+                    $rEPG = '<i class="text-success fas fa-circle"></i>';
+                } else if ($rRow["channel_id"]) {
+                    $rEPG = '<i class="text-warning fas fa-circle"></i>';
                 } else {
-                    $rReturn["data"][] = Array($rRow["id"], $rStreamName, $rServerName, $rStreamInfoText);
+                    $rEPG = '<i class="text-danger far fa-circle"></i>';
+                }
+                if (strlen($rRow["stream_icon"]) > 0) {
+					$rIcon = "<img src='./resize.php?max=32&url=".$rRow["stream_icon"]."' />";
+				} else {
+					$rIcon = "";
+				}
+                if ($rPermissions["is_admin"]) {
+                    $rReturn["data"][] = Array($rRow["id"], $rIcon, $rStreamName, $rServerName, $rClients, $rUptime, $rButtons, $rPlayer, $rEPG, $rStreamInfoText);
+                } else {
+                    $rReturn["data"][] = Array($rRow["id"], $rIcon, $rStreamName, $rServerName, $rStreamInfoText);
                 }
             }
         }
@@ -737,7 +757,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+            $rSearch = ESC($_GET["search"]["value"]);
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -783,6 +803,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -881,12 +902,12 @@ if ($rType == "users") {
                 $rProgressInfo = json_decode($rRow["progress_info"], True);
                 if ($rActualStatus == 1) {
                     if (!isset($rStreamInfo["codecs"]["video"])) {
-                        $rStreamInfo["codecs"]["video"] = "N/A";
+                        $rStreamInfo["codecs"]["video"] = Array("width" => "?", "height" => "?", "codec_name" => "N/A", "r_frame_rate" => "--");
                     }
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
-                        $rStreamInfo["codecs"]["audio"] = "N/A";
+                        $rStreamInfo["codecs"]["audio"] = Array("codec_name" => "N/A");
                     }
-                    if ($rRow['bitrate'] == 0) {
+                    if ($rRow['bitrate'] == 0) { 
                         $rRow['bitrate'] = "?";
                     }
                     if (isset($rProgressInfo["speed"])) {
@@ -897,7 +918,11 @@ if ($rType == "users") {
                     if (isset($rProgressInfo["fps"])) {
                         $rFPS = intval($rProgressInfo["fps"])." FPS";
                     } else {
-                        $rFPS = "--";
+						if (isset($rStreamInfo["codecs"]["video"]["r_frame_rate"])) {
+							$rFPS = intval($rStreamInfo["codecs"]["video"]["r_frame_rate"])." FPS";
+						} else {
+							$rFPS = "--";
+						}
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>
                         <tbody>
@@ -940,7 +965,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+            $rSearch = ESC($_GET["search"]["value"]);
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -986,6 +1011,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -1063,12 +1089,12 @@ if ($rType == "users") {
                 $rStreamInfo = json_decode($rRow["stream_info"], True);
                 if ($rActualStatus == 1) {
                     if (!isset($rStreamInfo["codecs"]["video"])) {
-                        $rStreamInfo["codecs"]["video"] = "N/A";
+                        $rStreamInfo["codecs"]["video"] = Array("width" => "?", "height" => "?", "codec_name" => "N/A", "r_frame_rate" => "--");
                     }
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
-                        $rStreamInfo["codecs"]["audio"] = "N/A";
+                        $rStreamInfo["codecs"]["audio"] = Array("codec_name" => "N/A");
                     }
-                    if ($rRow['bitrate'] == 0) {
+                    if ($rRow['bitrate'] == 0) { 
                         $rRow['bitrate'] = "?";
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>
@@ -1110,7 +1136,7 @@ if ($rType == "users") {
         $rWhere[] = "`series_episodes`.`series_id` = ".intval($_GET["series"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -1147,6 +1173,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rActualStatus = 0;
                 if (intval($rRow["direct_source"]) == 1) {
                     // Direct
@@ -1183,7 +1210,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`user_activity`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity`.`user_ip` LIKE '%{$rSearch}%' OR `user_activity`.`container` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity`.`date_start`) LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity`.`date_end`) LIKE '%{$rSearch}%' OR `user_activity`.`geoip_country_code` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1210,7 +1237,7 @@ if ($rType == "users") {
     if ($rOrder[$rOrderRow]) {
         $rOrderBy = "ORDER BY ".$rOrder[$rOrderRow]." ".$_GET["order"][0]["dir"];
     }
-    $rCountQuery = "SELECT COUNT(*) AS `count` FROM `user_activity` INNER JOIN `users` ON `user_activity`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity`.`server_id` = `streaming_servers`.`id` {$rWhereString};";
+    $rCountQuery = "SELECT COUNT(*) AS `count` FROM `user_activity` LEFT JOIN `users` ON `user_activity`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity`.`server_id` = `streaming_servers`.`id` {$rWhereString};";
     $rResult = $db->query($rCountQuery);
     if (($rResult) && ($rResult->num_rows == 1)) {
         $rReturn["recordsTotal"] = $rResult->fetch_assoc()["count"];
@@ -1223,6 +1250,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if ($rPermissions["is_admin"]) {
@@ -1280,7 +1308,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`user_activity_now`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity_now`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity_now`.`user_ip` LIKE '%{$rSearch}%' OR `user_activity_now`.`container` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity_now`.`date_start`) LIKE '%{$rSearch}%' OR `user_activity_now`.`geoip_country_code` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["server_id"]) > 0) {
@@ -1292,9 +1320,6 @@ if ($rType == "users") {
     if (strlen($_GET["user_id"]) > 0) {
         $rWhere[] = "`user_activity_now`.`user_id` = ".intval($_GET["user_id"]);
     }
-		if (strlen($_GET["user_agent"]) > 0) {
-			$rWhere[] = "`user_activity_now`.`user_agent` = ".intval($_GET["user_agent"]);
-	  }
     if (count($rWhere) > 0) {
         $rWhereString = "WHERE ".join(" AND ", $rWhere);
     } else {
@@ -1303,7 +1328,7 @@ if ($rType == "users") {
     if ($rOrder[$rOrderRow]) {
         $rOrderBy = "ORDER BY ".$rOrder[$rOrderRow]." ".$_GET["order"][0]["dir"];
     }
-    $rCountQuery = "SELECT COUNT(*) AS `count` FROM `user_activity_now` INNER JOIN `users` ON `user_activity_now`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity_now`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity_now`.`server_id` = `streaming_servers`.`id` {$rWhereString};";
+    $rCountQuery = "SELECT COUNT(*) AS `count` FROM `user_activity_now` LEFT JOIN `users` ON `user_activity_now`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity_now`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity_now`.`server_id` = `streaming_servers`.`id` {$rWhereString};";
     $rResult = $db->query($rCountQuery);
     if (($rResult) && ($rResult->num_rows == 1)) {
         $rReturn["recordsTotal"] = $rResult->fetch_assoc()["count"];
@@ -1316,6 +1341,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if ($rRow["divergence"] <= 10) {
@@ -1352,7 +1378,7 @@ if ($rType == "users") {
                 }
                 if ($rRow["date_start"]) {
                     $rTime = intval(time()) - intval($rRow["date_start"]);
-										$rTime = sprintf('%02d:%02d:%02d', ($rTime/3600),($rTime/60%60), $rTime%60);
+					$rTime = sprintf('%02d:%02d:%02d', ($rTime/3600),($rTime/60%60), $rTime%60);
                 } else {
                     $rTime = "";
                 }
@@ -1361,12 +1387,7 @@ if ($rType == "users") {
                 } else {
                     $rButtons = '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="Kill Connection" type="button" class="btn btn-outline-warning waves-effect waves-light btn-xs" onClick="api('.$rRow["pid"].', \'kill\');"><i class="fas fa-hammer"></i></button>';
                 }
-								if ($rRow["user_agent"]) {
-                    $rUA = $rRow["user_agent"];
-                } else {
-                    $rUA = "";
-                }
-                $rReturn["data"][] = Array($rRow["activity_id"], $rDivergence, $rUsername, $rChannel, $rServer,$rUA, $rTime, $rIP, $rGeoCountry, $rButtons);
+                $rReturn["data"][] = Array($rRow["activity_id"], $rDivergence, $rUsername, $rChannel, $rServer, $rRow["user_agent"], $rTime, $rIP, $rGeoCountry, $rButtons);
             }
         }
     }
@@ -1405,7 +1426,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1429,6 +1450,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rStatus);
             }
         }
@@ -1449,7 +1471,7 @@ if ($rType == "users") {
         $rWhere[] = "`streams`.`category_id` = ".intval($_GET["category"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -1488,6 +1510,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rActualStatus = 0;
                 if (intval($rRow["direct_source"]) == 1) {
                     // Direct
@@ -1539,7 +1562,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1563,6 +1586,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rStatus);
             }
         }
@@ -1586,7 +1610,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`series`.`id` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1610,6 +1634,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["title"], $rRow["category_name"]);
             }
         }
@@ -1626,7 +1651,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`target`.`username` LIKE '%{$rSearch}%' OR `owner`.`username` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `credits_log`.`amount` LIKE '%{$rSearch}%' OR `credits_log`.`reason` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1666,6 +1691,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_reguser")) {
 					$rOwner = "<a href='./reg_user.php?id=".$rRow["admin_id"]."'>".$rRow["owner_username"]."</a>";
 					$rTarget = "<a href='./reg_user.php?id=".$rRow["target_id"]."'>".$rRow["target_username"]."</a>";
@@ -1689,7 +1715,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`client_logs`.`client_status` LIKE '%{$rSearch}%' OR `client_logs`.`query_string` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `client_logs`.`user_agent` LIKE '%{$rSearch}%' OR `client_logs`.`ip` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1706,7 +1732,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["filter"]) > 0) {
-        $rWhere[] = "`client_logs`.`client_status` = '".$db->real_escape_string($_GET["filter"])."'";
+        $rWhere[] = "`client_logs`.`client_status` = '".ESC($_GET["filter"])."'";
     }
     if (count($rWhere) > 0) {
         $rWhereString = "WHERE ".join(" AND ", $rWhere);
@@ -1729,6 +1755,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_user")) {
 					$rUsername = "<a href='./user.php?id=".$rRow["user_id"]."'>".$rRow["username"]."</a>";
 				} else {
@@ -1750,7 +1777,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`reg_userlog`.`username` LIKE '%{$rSearch}%' OR `reg_userlog`.`type` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1790,6 +1817,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_reguser")) {
 					$rOwner = "<a href='./reg_user.php?id=".$rRow["owner_id"]."'>".$rRow["owner"]."</a>";
 				} else {
@@ -1811,7 +1839,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `stream_logs`.`error` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1851,6 +1879,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["server_name"], $rRow["error"], $rRow["date"]);
             }
         }
@@ -1872,7 +1901,7 @@ if ($rType == "users") {
         $rWhere[] = "`streams`.`category_id` = ".intval($_GET["category"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1896,6 +1925,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rRow["active_count"], "<button type='button' class='btn btn-outline-danger waves-effect waves-light btn-xs' href='javascript:void(0);' onClick='selectFingerprint(".$rRow["id"].")'><i class='mdi mdi-fingerprint'></i></button>");
             }
         }
@@ -1917,7 +1947,7 @@ if ($rType == "users") {
         $rWhere[] = "`reg_users`.`owner_id` IN (".join(",", $rAvailableMembers).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`reg_users`.`id` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR `reg_users`.`notes` LIKE '%{$rSearch}%' OR `r`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`reg_users`.`date_registered`) LIKE '%{$rSearch}%' OR from_unixtime(`reg_users`.`last_login`) LIKE '%{$rSearch}%' OR `reg_users`.`email` LIKE '%{$rSearch}%' OR `reg_users`.`ip` LIKE '%{$rSearch}%' OR `member_groups`.`group_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -1951,6 +1981,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				$rButtons = "";
                 if ($rRow["status"] == 1) {
                     $rStatus = '<i class="text-success fas fa-circle"></i>';
@@ -2010,7 +2041,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`series`.`id` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `series`.`releaseDate` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["category"]) > 0) {
@@ -2041,6 +2072,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				$rButtons = "";
 				if (hasPermissions("adv", "add_episode")) {
 					$rButtons .= '<a href="./episode.php?sid='.$rRow["id"].'"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="Add Episode(s)" type="button" class="btn btn-outline-primary waves-effect waves-light btn-xs"><i class="mdi mdi-plus-circle-outline"></i></button></a>
@@ -2089,7 +2121,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+            $rSearch = ESC($_GET["search"]["value"]);
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -2133,6 +2165,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rSeriesName = $rRow["title"]." - Season ".$rRow["season_num"];
@@ -2210,12 +2243,12 @@ if ($rType == "users") {
                 $rStreamInfo = json_decode($rRow["stream_info"], True);
                 if ($rActualStatus == 1) {
                     if (!isset($rStreamInfo["codecs"]["video"])) {
-                        $rStreamInfo["codecs"]["video"] = "N/A";
+                        $rStreamInfo["codecs"]["video"] = Array("width" => "?", "height" => "?", "codec_name" => "N/A", "r_frame_rate" => "--");
                     }
                     if (!isset($rStreamInfo["codecs"]["audio"])) {
-                        $rStreamInfo["codecs"]["audio"] = "N/A";
+                        $rStreamInfo["codecs"]["audio"] = Array("codec_name" => "N/A");
                     }
-                    if ($rRow['bitrate'] == 0) {
+                    if ($rRow['bitrate'] == 0) { 
                         $rRow['bitrate'] = "?";
                     }
                     $rStreamInfoText = "<table style='font-size: 12px;' class='text-center' align='center'>
@@ -2267,7 +2300,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = $db->real_escape_string($_GET["search"]["value"]);
+        $rSearch = ESC($_GET["search"]["value"]);
         $rWhere[] = "(`watch_output`.`id` LIKE '%{$rSearch}%' OR `watch_output`.`filename` LIKE '%{$rSearch}%' OR `watch_output`.`dateadded` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["server"]) > 0) {
@@ -2300,6 +2333,7 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
 				$rButtons = "";
                 if ($rRow["stream_id"] > 0) {
                     if ($rRow["type"] == 1) {

@@ -107,7 +107,7 @@ if (isset($_POST["submit_stream"])) {
         foreach ($rStreamIDs as $rStreamID) {
             $rQueries = Array();
             foreach ($rArray as $rKey => $rValue) {
-                $rQueries[] = "`".$db->real_escape_string($rKey)."` = '".$db->real_escape_string($rValue)."'";
+                $rQueries[] = "`".ESC($rKey)."` = '".ESC($rValue)."'";
             }
             if (count($rQueries) > 0) {
                 $rQueryString = join(",", $rQueries);
@@ -127,6 +127,7 @@ if (isset($_POST["submit_stream"])) {
                 $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rStreamID).";");
                 if (($result) && ($result->num_rows > 0)) {
                     while ($row = $result->fetch_assoc()) {
+                        $row = XSSRow($row);
                         $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                     }
                 }
@@ -166,25 +167,25 @@ if (isset($_POST["submit_stream"])) {
             if (isset($_POST["c_user_agent"])) {
                 $db->query("DELETE FROM `streams_options` WHERE `stream_id` = ".intval($rStreamID)." AND `argument_id` = 1;");
                 if ((isset($_POST["user_agent"])) && (strlen($_POST["user_agent"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 1, '".$db->real_escape_string($_POST["user_agent"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 1, '".ESC($_POST["user_agent"])."');");
                 }
             }
             if (isset($_POST["c_http_proxy"])) {
                 $db->query("DELETE FROM `streams_options` WHERE `stream_id` = ".intval($rStreamID)." AND `argument_id` = 2;");
                 if ((isset($_POST["http_proxy"])) && (strlen($_POST["http_proxy"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 2, '".$db->real_escape_string($_POST["http_proxy"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 2, '".ESC($_POST["http_proxy"])."');");
                 }
             }
 			if (isset($_POST["c_cookie"])) {
                 $db->query("DELETE FROM `streams_options` WHERE `stream_id` = ".intval($rStreamID)." AND `argument_id` = 17;");
                 if ((isset($_POST["cookie"])) && (strlen($_POST["cookie"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 17, '".$db->real_escape_string($_POST["cookie"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 17, '".ESC($_POST["cookie"])."');");
                 }
             }
 			if (isset($_POST["c_headers"])) {
                 $db->query("DELETE FROM `streams_options` WHERE `stream_id` = ".intval($rStreamID)." AND `argument_id` = 19;");
                 if ((isset($_POST["headers"])) && (strlen($_POST["headers"]) > 0)) {
-                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 19, '".$db->real_escape_string($_POST["headers"])."');");
+                    $db->query("INSERT INTO `streams_options`(`stream_id`, `argument_id`, `value`) VALUES(".intval($rStreamID).", 19, '".ESC($_POST["headers"])."');");
                 }
             }
             if (isset($_POST["c_bouquets"])) {

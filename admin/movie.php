@@ -80,6 +80,7 @@ if (isset($_POST["submit_movie"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` = 2;");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
+                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = $rSource;
@@ -119,6 +120,7 @@ if (isset($_POST["submit_movie"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` = 2;");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
+                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = $rSource;
@@ -164,7 +166,7 @@ if (isset($_POST["submit_movie"])) {
 		if (isset($_POST["edit"])) {
 			$rImportStreams[] = $rImportArray;
 		} else {
-			$rResult = $db->query("SELECT COUNT(`id`) AS `count` FROM `streams` WHERE `stream_display_name` = '".$db->real_escape_string($rImportArray["stream_display_name"])."' AND `type` = 2;");
+			$rResult = $db->query("SELECT COUNT(`id`) AS `count` FROM `streams` WHERE `stream_display_name` = '".ESC($rImportArray["stream_display_name"])."' AND `type` = 2;");
 			if ($rResult->fetch_assoc()["count"] == 0) {
 				$rImportStreams[] = $rImportArray;
 			} else {
@@ -183,7 +185,7 @@ if (isset($_POST["submit_movie"])) {
             $rImportArray["order"] = getNextOrder();
             $rSync = $rImportArray["async"];
             unset($rImportArray["async"]);
-            $rCols = "`".implode('`,`', array_keys($rImportArray))."`";
+            $rCols = ESC(implode(',', array_keys($rImportArray)));
             $rValues = null;
             foreach (array_values($rImportArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -193,14 +195,14 @@ if (isset($_POST["submit_movie"])) {
                 if (is_null($rValue)) {
                     $rValues .= 'NULL';
                 } else {
-                    $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                    $rValues .= '\''.ESC($rValue).'\'';
                 }
             }
             if (isset($_POST["edit"])) {
                 $rCols = "`id`,".$rCols;
-                $rValues = $_POST["edit"].",".$rValues;
+                $rValues = ESC($_POST["edit"]).",".$rValues;
             }
-            $rQuery = "REPLACE INTO `streams`(".$db->real_escape_string($rCols).") VALUES(".$rValues.");";
+            $rQuery = "REPLACE INTO `streams`(".$rCols.") VALUES(".$rValues.");";
             if ($db->query($rQuery)) {
                 if (isset($_POST["edit"])) {
                     $rInsertID = intval($_POST["edit"]);
@@ -212,6 +214,7 @@ if (isset($_POST["submit_movie"])) {
                     $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                     if (($result) && ($result->num_rows > 0)) {
                         while ($row = $result->fetch_assoc()) {
+                            $row = XSSRow($row);
                             $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                         }
                     }

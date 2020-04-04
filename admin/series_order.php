@@ -23,6 +23,7 @@ $rSeasons = Array();
 $result = $db->query("SELECT `series_episodes`.`id`, `series_episodes`.`season_num`, `streams`.`stream_display_name` FROM `series_episodes` LEFT JOIN `streams` ON `streams`.`id` = `series_episodes`.`stream_id` WHERE `series_id` = ".intval($rSeries["id"])." ORDER BY `series_episodes`.`season_num` ASC, `series_episodes`.`sort` ASC;");
 if (($result) && ($result->num_rows > 0)) {
     while ($row = $result->fetch_assoc()) {
+        $row = XSSRow($row);
         $rSeasons[$row["season_num"]][] = Array("id" => $row["id"], "title" => $row["stream_display_name"]);
     }
 }

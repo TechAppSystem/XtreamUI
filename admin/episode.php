@@ -138,7 +138,7 @@ if (isset($_POST["submit_stream"])) {
         if (isset($rImportArray["target_container"])) {
             $rArray["target_container"] = $rImportArray["target_container"];
         }
-        $rCols = "`".implode('`,`', array_keys($rArray))."`";
+        $rCols = ESC(implode(',', array_keys($rArray)));
         $rValues = null;
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -148,19 +148,19 @@ if (isset($_POST["submit_stream"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
-        $rQuery = "REPLACE INTO `streams`(".$db->real_escape_string($rCols).") VALUES(".$rValues.");";
+        $rQuery = "REPLACE INTO `streams`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
             if (isset($_POST["edit"])) {
                 $rInsertID = intval($_POST["edit"]);
             } else {
-                $rInsertID = $db->insert_id;
+                $rInsertID = intval($db->insert_id);
             }
             $db->query("DELETE FROM `series_episodes` WHERE `stream_id` = ".$rInsertID.";");
             $db->query("INSERT INTO `series_episodes`(`season_num`, `series_id`, `stream_id`, `sort`) VALUES(".intval($_POST["season_num"]).", ".intval($_POST["series"]).", ".$rInsertID.", ".intval($rImportArray["episode"]).");");
@@ -170,6 +170,7 @@ if (isset($_POST["submit_stream"])) {
                 $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                 if (($result) && ($result->num_rows > 0)) {
                     while ($row = $result->fetch_assoc()) {
+                        $row = XSSRow($row);
                         $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                     }
                 }
@@ -236,7 +237,7 @@ if (isset($_GET["id"])) {
     }
     $result = $db->query("SELECT `season_num`, `sort` FROM `series_episodes` WHERE `stream_id` = ".intval($rEpisode["id"]).";");
     if (($result) && ($result->num_rows == 1)) {
-        $row = $result->fetch_assoc();
+        $row = XSSRow($result->fetch_assoc());
         $rEpisode["episode"] = intval($row["sort"]);
         $rEpisode["season"] = intval($row["season_num"]);
     } else {

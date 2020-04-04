@@ -53,7 +53,7 @@ if (isset($_POST["submit_stream"])) {
             $rArray["stream_icon"] = downloadImage($rArray["stream_icon"]);
         }
         $rArray["order"] = getNextOrder();
-        $rCols = $db->real_escape_string("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
         $rValues = null;
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -63,12 +63,12 @@ if (isset($_POST["submit_stream"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `streams`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
@@ -84,6 +84,7 @@ if (isset($_POST["submit_stream"])) {
                 $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                 if (($result) && ($result->num_rows > 0)) {
                     while ($row = $result->fetch_assoc()) {
+                        $row = XSSRow($row);
                         $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                     }
                 }
@@ -641,6 +642,7 @@ if ($rSettings["sidebar"]) {
         var changeTitle = false;
         var rSwitches = [];
         var rChannels = {};
+                
         <?php if ((isset($rChannel)) && ($rProperties["type"] == 2)) { ?>
         var rSelection = <?=json_encode(getSelections(json_decode($rChannel["stream_source"], True)))?>;
         <?php } else { ?>

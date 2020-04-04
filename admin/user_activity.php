@@ -327,8 +327,13 @@ if ($rSettings["sidebar"]) {
             })
             <?php if (!$detect->isMobile()) { ?>
             setTimeout(reloadUsers, 5000);
+            <?php }
+            if (!$rAdminSettings["auto_refresh"]) { ?>
+            toggleAuto();
             <?php } ?>
-            $('#datatable-activity').DataTable().search($(this).val()).draw();
+            if ($('#act_search').val().length > 0) {
+                $('#datatable-activity').DataTable().search($('#act_search').val()).draw();
+            }
         });
         
         $(window).bind('beforeunload', function() {

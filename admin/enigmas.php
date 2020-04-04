@@ -316,6 +316,9 @@ if ($rSettings["sidebar"]) {
             setTimeout(reloadUsers, 10000);
             <?php } ?>
             $('#datatable-users').DataTable().search($(this).val()).draw();
+            <?php if (!$rAdminSettings["auto_refresh"]) { ?>
+            toggleAuto();
+            <?php } ?>
         });
         
         $(window).bind('beforeunload', function() {

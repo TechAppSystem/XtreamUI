@@ -9,7 +9,7 @@ if (isset($_POST["submit_folder"])) {
         if (isset($_POST["edit"])) {
             $rExtra = " AND `id` <> ".intval($_POST["edit"]);
         }
-        $result = $db->query("SELECT `id` FROM `watch_folders` WHERE `type` = '".$db->real_escape_string($_POST["folder_type"])."' AND `directory` = '".$db->real_escape_string($rPath)."' AND `server_id` = ".intval($_POST["server_id"]).$rExtra.";");
+        $result = $db->query("SELECT `id` FROM `watch_folders` WHERE `type` = '".ESC($_POST["folder_type"])."' AND `directory` = '".ESC($rPath)."' AND `server_id` = ".intval($_POST["server_id"]).$rExtra.";");
         if (($result) && ($result->num_rows == 0)) {
             if (isset($_POST["edit"])) {
                 $rArray = getWatchFolder($_POST["edit"]);
@@ -52,7 +52,7 @@ if (isset($_POST["submit_folder"])) {
             } else {
                 $rArray["auto_subtitles"] = 0;
             }
-            $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+            $rCols = ESC(implode(',', array_keys($rArray)));
             foreach (array_values($rArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
                 if (is_array($rValue)) {
@@ -61,12 +61,12 @@ if (isset($_POST["submit_folder"])) {
                 if (is_null($rValue)) {
                     $rValues .= 'NULL';
                 } else {
-                    $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                    $rValues .= '\''.ESC($rValue).'\'';
                 }
             }
             if (isset($_POST["edit"])) {
                 $rCols = "id,".$rCols;
-                $rValues = $_POST["edit"].",".$rValues;
+                $rValues = ESC($_POST["edit"]).",".$rValues;
             }
             $rQuery = "REPLACE INTO `watch_folders`(".$rCols.") VALUES(".$rValues.");";
             if ($db->query($rQuery)) {

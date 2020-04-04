@@ -9,7 +9,7 @@ if (isset($_POST["submit_category"])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+    $rCols = ESC(implode(',', array_keys($rArray)));
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {
@@ -18,12 +18,12 @@ if (isset($_POST["submit_category"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     if ((isset($_POST["edit"])) && (hasPermissions("adv", "edit_cat"))) {
         $rCols = "id,".$rCols;
-        $rValues = $_POST["edit"].",".$rValues;
+        $rValues = ESC($_POST["edit"]).",".$rValues;
     }
     $rQuery = "REPLACE INTO `stream_categories`(".$rCols.") VALUES(".$rValues.");";
     if ($db->query($rQuery)) {

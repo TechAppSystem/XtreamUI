@@ -79,7 +79,7 @@ if (isset($_POST["submit_server"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+        $rCols = ESC(implode(',', array_keys($rArray)));
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -88,12 +88,12 @@ if (isset($_POST["submit_server"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "id,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `streaming_servers`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {

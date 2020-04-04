@@ -14,7 +14,7 @@ if (isset($_POST["submit_settings"])) {
             $rGenreID = intval($rSplit[1]);
             $rBouquets = json_encode($_POST["bouquet_".$rGenreID]);
             if (!$rBouquets) { $rBouquets = "[]"; }
-            $db->query("UPDATE `watch_categories` SET `category_id` = ".intval($rValue).", `bouquets` = '".$db->real_escape_string($rBouquets)."' WHERE `genre_id` = ".intval($rGenreID)." AND `type` = 1;");
+            $db->query("UPDATE `watch_categories` SET `category_id` = ".intval($rValue).", `bouquets` = '".ESC($rBouquets)."' WHERE `genre_id` = ".intval($rGenreID)." AND `type` = 1;");
         }
     }
     foreach ($_POST as $rKey => $rValue) {
@@ -23,7 +23,7 @@ if (isset($_POST["submit_settings"])) {
             $rGenreID = intval($rSplit[1]);
             $rBouquets = json_encode($_POST["bouquettv_".$rGenreID]);
             if (!$rBouquets) { $rBouquets = "[]"; }
-            $db->query("UPDATE `watch_categories` SET `category_id` = ".intval($rValue).", `bouquets` = '".$db->real_escape_string($rBouquets)."' WHERE `genre_id` = ".intval($rGenreID)." AND `type` = 2;");
+            $db->query("UPDATE `watch_categories` SET `category_id` = ".intval($rValue).", `bouquets` = '".ESC($rBouquets)."' WHERE `genre_id` = ".intval($rGenreID)." AND `type` = 2;");
         }
     }
     if (isset($_POST["read_native"])) {
@@ -53,7 +53,7 @@ $rBouquets = getBouquets();
 
 $rResult = $db->query("SELECT * FROM `watch_settings`;");
 if (($rResult) && ($rResult->num_rows == 1)) {
-    $rWatchSettings = $rResult->fetch_assoc();
+    $rWatchSettings = XSSRow($rResult->fetch_assoc());
 }
 
 if ($rSettings["sidebar"]) {
@@ -185,7 +185,7 @@ if ($rSettings["sidebar"]) {
                                                             Select a Category and/or Bouquet to apply to each Genre. The first Genre of each movie will be used for allocation.
                                                         </p>
                                                         <?php $rResult = $db->query("SELECT * FROM `watch_categories` WHERE `type` = 1 ORDER BY `genre` ASC;");
-                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { ?>
+                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { $rRow = XSSRow($rRow); ?>
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-2 col-form-label" for="genre_<?=$rRow["genre_id"]?>"><?=$rRow["genre"]?></label>
                                                             <div class="col-md-4">
@@ -221,7 +221,7 @@ if ($rSettings["sidebar"]) {
                                                             Select a Category and/or Bouquet to apply to each Genre. The first Genre of each movie will be used for allocation.
                                                         </p>
                                                         <?php $rResult = $db->query("SELECT * FROM `watch_categories` WHERE `type` = 2 ORDER BY `genre` ASC;");
-                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { ?>
+                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { $rRow = XSSRow($rRow); ?>
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-2 col-form-label" for="genretv_<?=$rRow["genre_id"]?>"><?=$rRow["genre"]?></label>
                                                             <div class="col-md-4">

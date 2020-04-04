@@ -160,6 +160,7 @@ if ($rSettings["sidebar"]) {
                                     <thead>
                                         <tr>
                                             <th class="text-center">ID</th>
+                                            <th class="text-center">Icon</th>
                                             <th>Name</th>
                                             <th>Source</th>
                                             <?php if ($rPermissions["is_admin"]) { ?>
@@ -167,6 +168,7 @@ if ($rSettings["sidebar"]) {
                                             <th class="text-center">Uptime</th>
                                             <th class="text-center">Actions</th>
                                             <th class="text-center">Player</th>
+                                            <th class="text-center">EPG</th>
                                             <?php } ?>
                                             <th class="text-center">Stream Info</th>
                                         </tr>
@@ -347,10 +349,10 @@ if ($rSettings["sidebar"]) {
                 },
                 columnDefs: [
                     <?php if ($rPermissions["is_admin"]) { ?>
-                    {"className": "dt-center", "targets": [0,3,4,5,6,7]},
-                    {"orderable": false, "targets": [5,6]}
+                    {"className": "dt-center", "targets": [0,1,4,5,6,7,8,9]},
+                    {"orderable": false, "targets": [6,7]}
                     <?php } else { ?>
-                    {"className": "dt-center", "targets": [0,3]}
+                    {"className": "dt-center", "targets": [0,1,4]}
                     <?php } ?>
                 ],
                 order: [[ 0, "desc" ]],
@@ -363,34 +365,39 @@ if ($rSettings["sidebar"]) {
                 if (!window.rClearing) {
                     $('#datatable-streampage').DataTable().search($(this).val()).draw();
                 }
-            })
+            });
             $('#stream_show_entries').change(function(){
                 if (!window.rClearing) {
                     $('#datatable-streampage').DataTable().page.len($(this).val()).draw();
                 }
-            })
+            });
             $('#stream_category_id').change(function(){
                 if (!window.rClearing) {
                     $('[data-toggle="tooltip"]').tooltip("hide");
                     $("#datatable-streampage").DataTable().ajax.reload( null, false );
                 }
-            })
+            });
             $('#stream_server_id').change(function(){
                 if (!window.rClearing) {
                     $('[data-toggle="tooltip"]').tooltip("hide");
                     $("#datatable-streampage").DataTable().ajax.reload( null, false );
                 }
-            })
+            });
             $('#stream_filter').change(function(){
                 if (!window.rClearing) {
                     $('[data-toggle="tooltip"]').tooltip("hide");
                     $("#datatable-streampage").DataTable().ajax.reload( null, false );
                 }
-            })
+            });
             <?php if (!$detect->isMobile()) { ?>
             setTimeout(reloadStreams, 5000);
+            <?php }
+            if (!$rAdminSettings["auto_refresh"]) { ?>
+            toggleAuto();
             <?php } ?>
-            $('#datatable-streampage').DataTable().search($(this).val()).draw();
+            if ($('#stream_search').val().length > 0) {
+                $('#datatable-streampage').DataTable().search($('#stream_search').val()).draw();
+            }
         });
         
         $(window).bind('beforeunload', function() {

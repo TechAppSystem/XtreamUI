@@ -22,7 +22,7 @@ if (isset($_POST["submit_server"])) {
 			$rArray["rtmp_port"] = intval($_POST["rtmp_port"]);
 			unset($_POST["rtmp_port"]);
 		}
-        $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+        $rCols = ESC(implode(',', array_keys($rArray)));
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -31,7 +31,7 @@ if (isset($_POST["submit_server"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         $rQuery = "INSERT INTO `streaming_servers`(".$rCols.") VALUES(".$rValues.");";

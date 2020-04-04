@@ -126,7 +126,7 @@ if (isset($_POST["submit_group"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+        $rCols = ESC(implode(',', array_keys($rArray)));
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -135,12 +135,12 @@ if (isset($_POST["submit_group"])) {
             if (is_null($rValue)) {
                 $rValues .= 'NULL';
             } else {
-                $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                $rValues .= '\''.ESC($rValue).'\'';
             }
         }
         if (isset($_POST["edit"])) {
             $rCols = "`group_id`,".$rCols;
-            $rValues = $_POST["edit"].",".$rValues;
+            $rValues = ESC($_POST["edit"]).",".$rValues;
         }
         $rQuery = "REPLACE INTO `member_groups`(".$rCols.") VALUES(".$rValues.");";
         if ($db->query($rQuery)) {
@@ -291,16 +291,6 @@ if ($rSettings["sidebar"]) {
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">
-															<label class="col-md-4 col-form-label" for="allow_import"><?=$_["can_use_reseller_api"]?></label>
-                                                            <div class="col-md-2">
-                                                                <input name="allow_import" id="allow_import" type="checkbox" <?php if (isset($rGroup)) { if ($rGroup["allow_import"]) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
-                                                            </div>
-                                                            <label class="col-md-4 col-form-label" for="delete_users"><?=$_["can_delete_users"]?></label>
-                                                            <div class="col-md-2">
-                                                                <input name="delete_users" id="delete_users" type="checkbox" <?php if (isset($rGroup)) { if ($rGroup["delete_users"]) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="create_sub_resellers"><?=$_["can_create_subresellers"]?></label>
                                                             <div class="col-md-2">
                                                                 <input name="create_sub_resellers" id="create_sub_resellers" type="checkbox" <?php if (isset($rGroup)) { if ($rGroup["create_sub_resellers"]) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
@@ -331,6 +321,10 @@ if ($rSettings["sidebar"]) {
                                                             </div>
                                                         </div>
 														<div class="form-group row mb-4">
+                                                            <label class="col-md-4 col-form-label" for="delete_users"><?=$_["can_delete_users"]?></label>
+                                                            <div class="col-md-2">
+                                                                <input name="delete_users" id="delete_users" type="checkbox" <?php if (isset($rGroup)) { if ($rGroup["delete_users"]) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
                                                             <label class="col-md-4 col-form-label" for="minimum_trial_credits"><?=$_["minimum_credit_for_trials"]?></label>
                                                             <div class="col-md-2">
                                                                 <input type="text" class="form-control" id="minimum_trial_credits" name="minimum_trial_credits" value="<?php if (isset($rGroup)) { echo intval($rGroup["minimum_trial_credits"]); } else { echo "0"; } ?>" required data-parsley-trigger="change">

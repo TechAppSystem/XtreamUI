@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Xtream UI</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="robots" content="noindex,nofollow">
         <link rel="shortcut icon" href="assets/images/favicon.ico">
         <link href="assets/libs/jquery-nice-select/nice-select.css" rel="stylesheet" type="text/css" />
         <link href="assets/libs/switchery/switchery.min.css" rel="stylesheet" type="text/css" />
@@ -414,9 +415,6 @@
                                 <ul class="submenu">
                                     <li><a href="./ticket.php"><?=$_["create_ticket"]?></a></li>
                                     <li><a href="./tickets.php"><?=$_["manage_tickets"]?></a></li>
-                                    <?php if ($rPermissions["allow_import"]) { ?>
-                                    <li><a href="./resellersmarters.php"><?=$_["reseller_api_key"]?></a></li>
-                                    <?php } ?>
                                 </ul>
                             </li>
                             <?php }

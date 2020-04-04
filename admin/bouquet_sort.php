@@ -21,7 +21,7 @@ if (isset($_POST["bouquet_order_array"])) {
             usort($rBouquet, function ($u1, $u2)  use ($rOrderKeys) {
                 return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
             });
-            $db->query("UPDATE `users` SET `bouquet` = '[".$db->real_escape_string(join(",", $rBouquet))."]' WHERE `id` = ".intval($rUser["id"]).";");
+            $db->query("UPDATE `users` SET `bouquet` = '[".ESC(join(",", $rBouquet))."]' WHERE `id` = ".intval($rUser["id"]).";");
         }
         $rPackages = getPackages();
         foreach ($rPackages as $rPackage) {
@@ -29,7 +29,7 @@ if (isset($_POST["bouquet_order_array"])) {
             usort($rBouquet, function ($u1, $u2)  use ($rOrderKeys) {
                 return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
             });
-            $db->query("UPDATE `packages` SET `bouquets` = '[".$db->real_escape_string(join(",", $rBouquet))."]' WHERE `id` = ".intval($rPackage["id"]).";");
+            $db->query("UPDATE `packages` SET `bouquets` = '[".ESC(join(",", $rBouquet))."]' WHERE `id` = ".intval($rPackage["id"]).";");
         }
         $_STATUS = 0;
     } else {

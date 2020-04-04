@@ -128,14 +128,14 @@ if ($rSettings["sidebar"]) {
                                     <div class="slimscroll" style="height:350px;">
                                         <div class="timeline-alt">
                                             <?php 
-                                            $rResult = $db->query("SELECT `u`.`username`, `r`.`owner`, `r`.`date`, `r`.`type` FROM `reg_userlog` AS `r` INNER JOIN `reg_users` AS `u` ON `r`.`owner` = `u`.`id` WHERE `r`.`owner` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).") ORDER BY `r`.`date` DESC LIMIT 100;");
+                                            $rResult = $db->query("SELECT `u`.`username`, `r`.`owner`, `r`.`date`, `r`.`type` FROM `reg_userlog` AS `r` INNER JOIN `reg_users` AS `u` ON `r`.`owner` = `u`.`id` WHERE `r`.`owner` IN (".ESC(join(",", array_keys(getRegisteredUsers($rUserInfo["id"])))).") ORDER BY `r`.`date` DESC LIMIT 100;");
                                             if (($rResult) && ($rResult->num_rows > 0)) {
-                                                while ($rRow = $rResult->fetch_assoc()) { ?>
+                                                while ($rRow = $rResult->fetch_assoc()) { $rRow = XSSRow($rRow); ?>
                                                 <div class="timeline-item">
                                                     <i class="timeline-icon"></i>
                                                     <div class="timeline-item-info">
                                                         <a href="#" class="text-body font-weight-semibold mb-1 d-block"><?=$rRow["username"]?></a>
-                                                        <small><?=$rRow["type"]?></small>
+                                                        <small><?=html_entity_decode($rRow["type"])?></small>
                                                         <p>
                                                             <small class="text-muted"><?=date("Y-m-d H:i:s", $rRow["date"])?></small>
                                                         </p>

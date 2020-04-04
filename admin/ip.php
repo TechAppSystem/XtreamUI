@@ -4,7 +4,7 @@ if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "block_ips"))) { exi
 
 if (isset($_POST["submit_ip"])) {
     $rArray = Array("ip" => $_POST["ip"], "notes" => $_POST["notes"], "date" => time(), "attempts_blocked" => 0);
-    $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+    $rCols = ESC(implode(',', array_keys($rArray)));
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {
@@ -13,7 +13,7 @@ if (isset($_POST["submit_ip"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     $rQuery = "REPLACE INTO `blocked_ips`(".$rCols.") VALUES(".$rValues.");";

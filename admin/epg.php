@@ -9,7 +9,7 @@ if (isset($_POST["submit_epg"])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+    $rCols = ESC(implode(',', array_keys($rArray)));
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {
@@ -18,13 +18,13 @@ if (isset($_POST["submit_epg"])) {
         if (is_null($rValue)) {
             $rValues .= 'NULL';
         } else {
-            $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+            $rValues .= '\''.ESC($rValue).'\'';
         }
     }
     if (isset($_POST["edit"])) {
 		if (!hasPermissions("adv", "epg_edit")) { exit; }
         $rCols = "id,".$rCols;
-        $rValues = $_POST["edit"].",".$rValues;
+        $rValues = ESC($_POST["edit"]).",".$rValues;
     } else if (!hasPermissions("adv", "add_epg")) { exit; }
     $rQuery = "REPLACE INTO `epg`(".$rCols.") VALUES(".$rValues.");";
     if ($db->query($rQuery)) {

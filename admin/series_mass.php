@@ -14,7 +14,7 @@ if (isset($_POST["submit_series"])) {
         foreach ($rSeriesIDs as $rSeriesID) {
             $rQueries = Array();
             foreach ($rArray as $rKey => $rValue) {
-                $rQueries[] = "`".$db->real_escape_string($rKey)."` = '".$db->real_escape_string($rValue)."'";
+                $rQueries[] = "`".ESC($rKey)."` = '".ESC($rValue)."'";
             }
             if (count($rQueries) > 0) {
                 $rQueryString = join(",", $rQueries);

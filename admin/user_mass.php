@@ -44,7 +44,7 @@ if (isset($_POST["submit_user"])) {
     }
     if (isset($_POST["c_bouquets"])) {
         $rArray["bouquet"] = Array();
-		foreach ($_POST["bouquets_selected"] as $rBouquet) {
+		foreach (json_decode($_POST["bouquets_selected"], True) as $rBouquet) {
 			if (is_numeric($rBouquet)) {
 				$rArray["bouquet"][] = intval($rBouquet);
 			}
@@ -54,13 +54,14 @@ if (isset($_POST["submit_user"])) {
         usort($rArray["bouquet"], function ($u1, $u2)  use ($rOrderKeys) {
             return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
         });
+        $rArray["bouquet"] = "[".join(",", $rArray["bouquet"])."]";
     }
     $rUsers = json_decode($_POST["users_selected"], True);
     if (count($rUsers) > 0) {
         foreach ($rUsers as $rUser) {
             $rQueries = Array();
             foreach ($rArray as $rKey => $rValue) {
-                $rQueries[] = "`".$db->real_escape_string($rKey)."` = '".$db->real_escape_string($rValue)."'";
+                $rQueries[] = "`".ESC($rKey)."` = '".ESC($rValue)."'";
             }
             if (count($rQueries) > 0) {
                 $rQueryString = join(",", $rQueries);

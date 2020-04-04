@@ -20,7 +20,7 @@ if (isset($_POST["submit_mag"])) {
             $rArray["pair_id"] = $rArray["id"];
             unset($rArray["id"]);
             // Create new user.
-            $rCols = $db->real_escape_string(implode(',', array_keys($rArray)));
+            $rCols = ESC(implode(',', array_keys($rArray)));
             foreach (array_values($rArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
                 if (is_array($rValue)) {
@@ -29,7 +29,7 @@ if (isset($_POST["submit_mag"])) {
                 if (is_null($rValue)) {
                     $rValues .= 'NULL';
                 } else {
-                    $rValues .= '\''.$db->real_escape_string($rValue).'\'';
+                    $rValues .= '\''.ESC($rValue).'\'';
                 }
             }
             $rQuery = "INSERT INTO `users`(".$rCols.") VALUES(".$rValues.");";
@@ -38,10 +38,10 @@ if (isset($_POST["submit_mag"])) {
                 $rArray = Array("user_id" => $rNewID, "mac" => base64_encode($_POST["mac"]));
                 // Create / Edit MAG.
                 if (isset($_POST["edit"])) {
-                    $db->query("UPDATE `mag_devices` SET `user_id` = ".intval($rNewID).", `mac` = '".base64_encode($db->real_escape_string($_POST["mac"]))."' WHERE `mag_id` = ".intval($_POST["edit"]).";");
+                    $db->query("UPDATE `mag_devices` SET `user_id` = ".intval($rNewID).", `mac` = '".ESC(base64_encode($_POST["mac"]))."' WHERE `mag_id` = ".intval($_POST["edit"]).";");
                     $rEditID = $_POST["edit"];
                 } else {
-                    $db->query("INSERT INTO `mag_devices`(`user_id`, `mac`) VALUES(".intval($rNewID).", '".$db->real_escape_string(base64_encode($_POST["mac"]))."');");
+                    $db->query("INSERT INTO `mag_devices`(`user_id`, `mac`) VALUES(".intval($rNewID).", '".ESC(base64_encode($_POST["mac"]))."');");
                     $rEditID = $db->insert_id;
                 }
                 $db->query("INSERT INTO `user_output`(`user_id`, `access_output_id`) VALUES(".intval($rNewID).", 2);");
@@ -49,7 +49,7 @@ if (isset($_POST["submit_mag"])) {
             }
         } else if ((isset($_POST["edit"])) && (strlen($_POST["edit"]))) {
             // Don't create a new user, legacy support for device.
-            $db->query("UPDATE `mag_devices` SET `mac` = '".base64_encode($db->real_escape_string($_POST["mac"]))."' WHERE `mag_id` = ".intval($_POST["edit"]).";");
+            $db->query("UPDATE `mag_devices` SET `mac` = '".ESC(base64_encode($_POST["mac"]))."' WHERE `mag_id` = ".intval($_POST["edit"]).";");
             header("Location: ./mag.php?id=".$_POST["edit"]); exit;
         }
     } else {

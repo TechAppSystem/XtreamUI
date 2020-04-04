@@ -42,7 +42,7 @@ if (isset($_POST["submit_profile"])) {
         } else {
             $rDNS = $rUserInfo["reseller_dns"];
         }
-		$db->query("UPDATE `reg_users` SET `password` = '".$db->real_escape_string($rPassword)."', `email` = '".$db->real_escape_string($rEmail)."', `reseller_dns` = '".$db->real_escape_string($rDNS)."', `dark_mode` = ".intval($rDarkMode).", `sidebar` = ".intval($rSidebar).", `expanded_sidebar` = ".intval($rExpanded)." WHERE `id` = ".intval($rUserInfo["id"]).";");
+		$db->query("UPDATE `reg_users` SET `password` = '".ESC($rPassword)."', `email` = '".ESC($rEmail)."', `reseller_dns` = '".ESC($rDNS)."', `dark_mode` = ".intval($rDarkMode).", `sidebar` = ".intval($rSidebar).", `expanded_sidebar` = ".intval($rExpanded)." WHERE `id` = ".intval($rUserInfo["id"]).";");
 		$rUserInfo = getRegisteredUser($rUserInfo["id"]);
 		$rAdminSettings["dark_mode"] = $rUserInfo["dark_mode"];
 		$rAdminSettings["expanded_sidebar"] = $rUserInfo["expanded_sidebar"];

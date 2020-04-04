@@ -6,14 +6,12 @@ if ((!hasPermissions("adv", "settings")) && (!hasPermissions("adv", "database"))
 $rTMDBLanguages = Array("" => "Default - EN", "aa" => "Afar", "af" => "Afrikaans", "ak" => "Akan", "an" => "Aragonese", "as" => "Assamese", "av" => "Avaric", "ae" => "Avestan", "ay" => "Aymara", "az" => "Azerbaijani", "ba" => "Bashkir", "bm" => "Bambara", "bi" => "Bislama", "bo" => "Tibetan", "br" => "Breton", "ca" => "Catalan", "cs" => "Czech", "ce" => "Chechen", "cu" => "Slavic", "cv" => "Chuvash", "kw" => "Cornish", "co" => "Corsican", "cr" => "Cree", "cy" => "Welsh", "da" => "Danish", "de" => "German", "dv" => "Divehi", "dz" => "Dzongkha", "eo" => "Esperanto", "et" => "Estonian", "eu" => "Basque", "fo" => "Faroese", "fj" => "Fijian", "fi" => "Finnish", "fr" => "French", "fy" => "Frisian", "ff" => "Fulah", "gd" => "Gaelic", "ga" => "Irish", "gl" => "Galician", "gv" => "Manx", "gn" => "Guarani", "gu" => "Gujarati", "ht" => "Haitian", "ha" => "Hausa", "sh" => "Serbo-Croatian", "hz" => "Herero", "ho" => "Hiri Motu", "hr" => "Croatian", "hu" => "Hungarian", "ig" => "Igbo", "io" => "Ido", "ii" => "Yi", "iu" => "Inuktitut", "ie" => "Interlingue", "ia" => "Interlingua", "id" => "Indonesian", "ik" => "Inupiaq", "is" => "Icelandic", "it" => "Italian", "ja" => "Japanese", "kl" => "Kalaallisut", "kn" => "Kannada", "ks" => "Kashmiri", "kr" => "Kanuri", "kk" => "Kazakh", "km" => "Khmer", "ki" => "Kikuyu", "rw" => "Kinyarwanda", "ky" => "Kirghiz", "kv" => "Komi", "kg" => "Kongo", "ko" => "Korean", "kj" => "Kuanyama", "ku" => "Kurdish", "lo" => "Lao", "la" => "Latin", "lv" => "Latvian", "li" => "Limburgish", "ln" => "Lingala", "lt" => "Lithuanian", "lb" => "Letzeburgesch", "lu" => "Luba-Katanga", "lg" => "Ganda", "mh" => "Marshall", "ml" => "Malayalam", "mr" => "Marathi", "mg" => "Malagasy", "mt" => "Maltese", "mo" => "Moldavian", "mn" => "Mongolian", "mi" => "Maori", "ms" => "Malay", "my" => "Burmese", "na" => "Nauru", "nv" => "Navajo", "nr" => "Ndebele", "nd" => "Ndebele", "ng" => "Ndonga", "ne" => "Nepali", "nl" => "Dutch", "nn" => "Norwegian Nynorsk", "nb" => "Norwegian Bokmal", "no" => "Norwegian", "ny" => "Chichewa", "oc" => "Occitan", "oj" => "Ojibwa", "or" => "Oriya", "om" => "Oromo", "os" => "Ossetian; Ossetic", "pi" => "Pali", "pl" => "Polish", "pt" => "Portuguese", "pt-BR" => "Portuguese - Brazil", "qu" => "Quechua", "rm" => "Raeto-Romance", "ro" => "Romanian", "rn" => "Rundi", "ru" => "Russian", "sg" => "Sango", "sa" => "Sanskrit", "si" => "Sinhalese", "sk" => "Slovak", "sl" => "Slovenian", "se" => "Northern Sami", "sm" => "Samoan", "sn" => "Shona", "sd" => "Sindhi", "so" => "Somali", "st" => "Sotho", "es" => "Spanish", "sq" => "Albanian", "sc" => "Sardinian", "sr" => "Serbian", "ss" => "Swati", "su" => "Sundanese", "sw" => "Swahili", "sv" => "Swedish", "ty" => "Tahitian", "ta" => "Tamil", "tt" => "Tatar", "te" => "Telugu", "tg" => "Tajik", "tl" => "Tagalog", "th" => "Thai", "ti" => "Tigrinya", "to" => "Tonga", "tn" => "Tswana", "ts" => "Tsonga", "tk" => "Turkmen", "tr" => "Turkish", "tw" => "Twi", "ug" => "Uighur", "uk" => "Ukrainian", "ur" => "Urdu", "uz" => "Uzbek", "ve" => "Venda", "vi" => "Vietnamese", "vo" => "Volapük", "wa" => "Walloon", "wo" => "Wolof", "xh" => "Xhosa", "yi" => "Yiddish", "za" => "Zhuang", "zu" => "Zulu", "ab" => "Abkhazian", "zh" => "Mandarin", "ps" => "Pushto", "am" => "Amharic", "ar" => "Arabic", "bg" => "Bulgarian", "cn" => "Cantonese", "mk" => "Macedonian", "el" => "Greek", "fa" => "Persian", "he" => "Hebrew", "hi" => "Hindi", "hy" => "Armenian", "en" => "English", "ee" => "Ewe", "ka" => "Georgian", "pa" => "Punjabi", "bn" => "Bengali", "bs" => "Bosnian", "ch" => "Chamorro", "be" => "Belarusian", "yo" => "Yoruba");
 $rMAGs = Array("AuraHD","AuraHD2","AuraHD3","AuraHD4","AuraHD5","AuraHD6","AuraHD7","AuraHD8","AuraHD9","MAG200","MAG245","MAG245D","MAG250","MAG254","MAG255","MAG256","MAG257","MAG260","MAG270","MAG275","MAG322","MAG323","MAG324","MAG325","MAG349","MAG350","MAG351","MAG352","MAG420","WR320");
 
-if ((isset($_GET["update"])) && (hasPermissions("adv", "settings"))) {
-    updateTables();
-    header("Location: ./settings.php");exit;
-}
-
-if ((isset($_GET["reset"])) && (hasPermissions("adv", "settings"))) {
-    resetSettings();
-    header("Location: ./settings.php");exit;
+if (isset($_GET["geolite2"])) {
+    if (updateGeoLite2()) {
+        $_STATUS = 3;
+    } else {
+        $_STATUS = 2;
+    }
 }
 
 if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
@@ -31,12 +29,6 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
     }
     if (!isset($_POST["allowed_stb_types"])) {
         $rArray["allowed_stb_types"] = Array();
-    }
-    if (isset($_POST["auto_update"])) {
-        $rAdminSettings["auto_update"] = true;
-        unset($_POST["auto_update"]);
-    } else {
-        $rAdminSettings["auto_update"] = false;
     }
 	if (isset($_POST["disable_trial"])) {
         $rAdminSettings["disable_trial"] = true;
@@ -61,6 +53,12 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
         unset($_POST["download_images"]);
     } else {
         $rAdminSettings["download_images"] = false;
+    }
+    if (isset($_POST["auto_refresh"])) {
+        $rAdminSettings["auto_refresh"] = true;
+        unset($_POST["auto_refresh"]);
+    } else {
+        $rAdminSettings["auto_refresh"] = false;
     }
     if (isset($_POST["local_api"])) {
         $rAdminSettings["local_api"] = true;
@@ -127,14 +125,6 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
         $rAdminSettings["admin_password"] = $_POST["admin_password"];
         unset($_POST["admin_password"]);
     }
-    if (isset($_POST["forum_username"])) {
-        $rAdminSettings["forum_username"] = $_POST["forum_username"];
-        unset($_POST["forum_username"]);
-    }
-    if ((isset($_POST["forum_password"])) && (strlen($_POST["forum_password"]) > 0)) {
-        $rAdminSettings["forum_password"] = $_POST["forum_password"];
-        unset($_POST["forum_password"]);
-    }
     if (isset($_POST["tmdb_language"])) {
         $rAdminSettings["tmdb_language"] = $_POST["tmdb_language"];
         unset($_POST["tmdb_language"]);
@@ -179,9 +169,9 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
             $rValue = json_encode($rValue);
         }
         if (is_null($rValue)) {
-            $rValues[] = '`'.$db->real_escape_string($rKey).'` = NULL';
+            $rValues[] = '`'.ESC($rKey).'` = NULL';
         } else {
-            $rValues[] = '`'.$db->real_escape_string($rKey).'` = \''.$db->real_escape_string($rValue).'\'';
+            $rValues[] = '`'.ESC($rKey).'` = \''.ESC($rValue).'\'';
         }
     }
     $rQuery = "UPDATE `settings` SET ".join(", ", $rValues).";";
@@ -224,6 +214,27 @@ if ($rSettings["sidebar"]) {
                                 </button>
                                 Settings sucessfully updated!
                             </div>
+                            <?php } else if ((isset($_STATUS)) && ($_STATUS == 1)) { ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                There was an error saving settings! Please check the form entry and try again.
+                            </div>
+                            <?php } else if ((isset($_STATUS)) && ($_STATUS == 2)) { ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                Failed to update GeoLite2! Please try again.
+                            </div>
+                            <?php } else if ((isset($_STATUS)) && ($_STATUS == 3)) { ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                GeoLite2 has been updated sucessfully.
+                            </div>
                             <?php } else if ((isset($_STATUS)) && ($_STATUS > 0)) { ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -233,8 +244,17 @@ if ($rSettings["sidebar"]) {
                             </div>
                             <?php }
 							$rContext = stream_context_create(array('http'=> array('timeout' => 3)));
-							$rCurrent = json_decode(file_get_contents("http://donator.xtream-ui.com/current.json", false, $rContext), True);
+							$rCurrent = json_decode(file_get_contents("https://xtream-ui.com/current.json", false, $rContext), True);
+                            $rGeoLite2 = json_decode(file_get_contents("https://xtream-ui.com/GeoLite2/status.json", false, $rContext), True);
+                            if (intval($rGeoLite2["version"]) > $rAdminSettings["geolite2_version"]) {
 							?>
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                A new version of GeoLite2 (<?=$rGeoLite2["version"]?>) is available. <a href="./settings.php?geolite2">Click here to update!</a>
+                            </div>
+                            <?php } ?>
                             <div class="card">
                                 <div class="card-body">
 									<div class="bg-soft-light border-light border">
@@ -247,14 +267,14 @@ if ($rSettings["sidebar"]) {
 												</h2>
 											</div>
 											<div class="col-md-4">
-												<p class="text-muted mb-0 mt-3">Current Release</p>
+												<p class="text-muted mb-0 mt-3">Official Release</p>
 												<h2 class="font-weight-normal mb-3">
 													<small class="mdi mdi-checkbox-blank-circle text-info align-middle mr-1"></small>
 													<span><?=$rCurrent["official"][0]?><sup class="font-13"> <?=$rCurrent["official"][1]?></sup></span>
 												</h2>
 											</div>
 											<div class="col-md-4">
-												<p class="text-muted mb-0 mt-3">Current EA Release</p>
+												<p class="text-muted mb-0 mt-3">Early Access Release</p>
 												<h2 class="font-weight-normal mb-3">
 													<small class="mdi mdi-checkbox-blank-circle text-danger align-middle mr-1"></small>
 													<span><?=$rCurrent["ea"][0]?><sup class="font-13"><?=$rCurrent["ea"][1]?></sup></span>
@@ -288,12 +308,6 @@ if ($rSettings["sidebar"]) {
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a href="#ddos" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2"> 
-													<i class="mdi mdi-bug mr-1"></i>
-                                                    <span class="d-none d-sm-inline">DDOS</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
                                                 <a href="#streaming" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2"> 
 													<i class="mdi mdi-play mr-1"></i>
                                                     <span class="d-none d-sm-inline">Streaming</span>
@@ -311,6 +325,12 @@ if ($rSettings["sidebar"]) {
                                                 <a href="#backups" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2">
 													<i class="mdi mdi-backup-restore mr-1"></i>
                                                     <span class="d-none d-sm-inline">Backups</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="#database" data-toggle="tab" class="nav-link rounded-0 pt-2 pb-2">
+													<i class="mdi mdi-database mr-1"></i>
+                                                    <span class="d-none d-sm-inline">Database</span>
                                                 </a>
                                             </li>
 											<?php } ?>
@@ -398,15 +418,6 @@ if ($rSettings["sidebar"]) {
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">
-                                                            <label class="col-md-4 col-form-label" for="forum_username">Update Credentials <i data-toggle="tooltip" data-placement="top" title="" data-original-title="To enable auto-update, enter your forum username and password here." class="mdi mdi-information"></i></label>
-                                                            <div class="col-md-4">
-                                                                <input type="text" placeholder="Forum Username" class="form-control" id="forum_username" name="forum_username" value="<?=htmlspecialchars($rAdminSettings["forum_username"])?>">
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <input type="password" placeholder="<?php if (strlen($rAdminSettings["forum_password"]) > 0) { echo str_repeat("*", strlen($rAdminSettings["forum_password"])); } else { echo "Forum Password"; } ?>" class="form-control" id="forum_password" name="forum_password" value="">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="tmdb_api_key">TMDB Key</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" class="form-control" id="tmdb_api_key" name="tmdb_api_key" value="<?=htmlspecialchars($rSettings["tmdb_api_key"])?>">
@@ -465,16 +476,6 @@ if ($rSettings["sidebar"]) {
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">
-                                                            <label class="col-md-4 col-form-label" for="auto_update">Auto Update</label>
-                                                            <div class="col-md-2">
-                                                                <input name="auto_update" id="auto_update" type="checkbox"<?php if ($rAdminSettings["auto_update"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
-                                                            </div>
-                                                            <label class="col-md-4 col-form-label" for="download_images">Download Images <i data-toggle="tooltip" data-placement="top" title="" data-original-title="If this option is set, images from TMDb for example will be downloaded to the master server." class="mdi mdi-information"></i></label>
-                                                            <div class="col-md-2">
-                                                                <input name="download_images" id="download_images" type="checkbox"<?php if ($rAdminSettings["download_images"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="default_entries">Default Entries to Show <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Default entries for Users, Registered Users, Streams, VOD and Logs." class="mdi mdi-information"></i></label>
                                                             <div class="col-md-2">
                                                                 <select name="default_entries" id="default_entries" class="form-control" data-toggle="select2">
@@ -506,6 +507,16 @@ if ($rSettings["sidebar"]) {
                                                             <label class="col-md-4 col-form-label" for="dashboard_stats_frequency">Stats Interval <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Seconds between connection statistics. 600 for 10 minute intervals, which will show 6 individual statistics per hour. Small figures will cause crashes on dashboard." class="mdi mdi-information"></i></label>
                                                             <div class="col-md-2">
                                                                 <input type="text" class="form-control" id="dashboard_stats_frequency" name="dashboard_stats_frequency" value="<?=htmlspecialchars($rAdminSettings["dashboard_stats_frequency"]) ?: 600?>">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mb-4">
+                                                            <label class="col-md-4 col-form-label" for="download_images">Download Images <i data-toggle="tooltip" data-placement="top" title="" data-original-title="If this option is set, images from TMDb for example will be downloaded to the master server." class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input name="download_images" id="download_images" type="checkbox"<?php if ($rAdminSettings["download_images"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                            <label class="col-md-4 col-form-label" for="auto_refresh">Auto-Refresh by Default <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Auto-refresh pages by deault, where auto-refresh is available." class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input name="auto_refresh" id="auto_refresh" type="checkbox"<?php if ($rAdminSettings["auto_refresh"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -563,7 +574,7 @@ if ($rSettings["sidebar"]) {
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <div class="tab-pane" id="ddos">
+                                            <div class="tab-pane" id="streaming">
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <div class="form-group row mb-4">
@@ -578,17 +589,6 @@ if ($rSettings["sidebar"]) {
                                                                 <input type="text" class="form-control" id="flood_ips_exclude" name="flood_ips_exclude" value="<?=htmlspecialchars($rSettings["flood_ips_exclude"])?>">
                                                             </div>
                                                         </div>
-                                                    </div> <!-- end col -->
-                                                </div> <!-- end row -->
-                                                <ul class="list-inline wizard mb-0">
-                                                    <li class="list-inline-item float-right">
-                                                        <input name="submit_settings" type="submit" class="btn btn-primary" value="Save Changes" />
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="tab-pane" id="streaming">
-                                                <div class="row">
-                                                    <div class="col-12">
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="user_auto_kick_hours">Auto-Kick Users <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Automatically kick users who are online for more than X hours." class="mdi mdi-information"></i></label>
                                                             <div class="col-md-2">
@@ -894,18 +894,15 @@ if ($rSettings["sidebar"]) {
                                                     </div> <!-- end col -->
                                                 </div> <!-- end row -->
                                                 <ul class="list-inline wizard mb-0" style="margin-top:30px;">
-													<?php if (hasPermissions("adv", "settings")) { ?>
-                                                    <li class="list-inline-item">
-                                                        <a href="./settings.php?update"><button type="button" class="btn btn-warning waves-effect waves-light btn-xl">Update Tables</button></a>
-                                                    </li>
-                                                    <li class="list-inline-item">
-                                                        <a href="./settings.php?reset"><button type="button" class="btn btn-danger waves-effect waves-light btn-xl">Reset Settings</button></a>
-                                                    </li>
-													<?php } ?>
                                                     <li class="list-inline-item float-right">
                                                         <button id="create_backup" onClick="api('', 'backup')" class="btn btn-primary">Create Backup</button>
                                                     </li>
                                                 </ul>
+                                            </div>
+                                            <div class="tab-pane" id="database">
+                                                <div class="row">
+                                                    <iframe width="100%" height="650px" src="./database.php" style="overflow-x:hidden;border:0px;"></iframe>
+                                                </div> <!-- end row -->
                                             </div>
 											<?php } ?>
                                         </div> <!-- tab-content -->
@@ -950,7 +947,7 @@ if ($rSettings["sidebar"]) {
                                                         <?php }
                                                         $result = $db->query("SELECT `username`, `reseller_dns` FROM `reg_users` WHERE `reseller_dns` <> '' AND `verified` = 1 ORDER BY `username` ASC;");
                                                         if (($result) && ($result->num_rows > 0)) {
-                                                        while ($row = $result->fetch_assoc()) { ?>
+                                                        while ($row = $result->fetch_assoc()) { $row = XSSRow($row); ?>
                                                         <tr>
                                                             <td><?=$row["username"]?></td>
                                                             <td><?=$row["reseller_dns"]?></td>

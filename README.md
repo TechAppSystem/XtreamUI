@@ -12,7 +12,6 @@
 * Patched all files against XSS exploits.
 * Added GeoLite2 updater.
 * Reintegrated database editor.
-<span style="color:red">some **Added user-agent to Live Connections page.** text</span>
 * Added user-agent to Live Connections page.
 * Fixed search not being actioned on refresh.
 * Added stream icons to stream page.

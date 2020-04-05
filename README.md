@@ -1,3 +1,19 @@
+# Beta Release 22E
+
+* Refined santisation for speed. No longer sanitises MySQL output, only input.
+* Added STB lock reset to MAG Events for those who have issues with MAG devices.
+* Added a timeout to mysql queries for those with too many user_activity entries for the page to load.
+* Removed auto-refresh on user_activity as there are usually too many entries.
+* Fixed sort functions on User IP's page.
+* Fixed stream table on created channel page.
+* Added a sanitisation script to scan the database for unsanitised input and correct it. Only needs to be run once (see below).
+# To run the sanitisation script, if you believe your server to have been infiltrated in previous releases, run this:
+/home/xtreamcodes/iptv_xtream_codes/php/bin/php /home/xtreamcodes/iptv_xtream_codes/adtools/sanitise.php
+
+It'll take a while but it checks the entire database for any malformed or malicious input.
+
+
+
 # if you have same problems pls use this for fix 
 
 * chmod -R 0777 /home/xtreamcodes

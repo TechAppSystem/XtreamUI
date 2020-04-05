@@ -20,7 +20,6 @@ if (isset($_POST["submit_movies"])) {
         $result = $db->query("SELECT `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rMovie).";");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
-                $row = XSSRow($row);
                 deleteMovieFile($row["server_id"], $rMovie);
             }
         }
@@ -48,11 +47,9 @@ if (isset($_POST["submit_series"])) {
         $rResult = $db->query("SELECT `stream_id` FROM `series_episodes` WHERE `series_id` = ".intval($rSerie).";");
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rResultB = $db->query("SELECT `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rRow["stream_id"]).";");
                 if (($rResultB) && ($rResultB->num_rows > 0)) {
                     while ($rRowB = $rResultB->fetch_assoc()) {
-                        $rRowB = XSSRow($rRowB);
                         deleteMovieFile($rRowB["server_id"], $rRow["stream_id"]);
                     }
                 }
@@ -72,7 +69,6 @@ if (isset($_POST["submit_episodes"])) {
         $result = $db->query("SELECT `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rEpisode).";");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
-                $row = XSSRow($row);
                 deleteMovieFile($row["server_id"], $rEpisode);
             }
         }

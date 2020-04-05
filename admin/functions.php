@@ -2,8 +2,9 @@
 include_once("/home/xtreamcodes/iptv_xtream_codes/admin/HTMLPurifier.standalone.php");
 
 $rRelease = 22;             // Official Beta Release Number
-$rEarlyAccess = "D";	   	// Early Access Release
-$rTimeout = 60;             // Seconds Timeout for Queries, Functions & Requests
+$rEarlyAccess = "E";	   	// Early Access Release
+$rTimeout = 60;             // Seconds Timeout for Functions & Requests
+$rSQLTimeout = 5;           // Max execution time for MySQL queries.
 $rDebug = False;
 $rPurifier = new HTMLPurifier(HTMLPurifier_Config::createDefault());
 
@@ -27,7 +28,7 @@ function XSSRow($rRow) {
 
 function ESC($rString) {
     global $db;
-    return $db->real_escape_string($rString);
+    return XSS($db->real_escape_string($rString));
 }
 
 function sortArrayByArray(array $rArray, array $rSort) {
@@ -60,13 +61,17 @@ function updateGeoLite2() {
     return false;
 }
 
+function resetSTB($rID) {
+    global $db;
+    $db->query("UPDATE `mag_devices` SET `ip` = NULL, `ver` = NULL, `image_version` = NULL, `stb_type` = NULL, `sn` = NULL, `device_id` = NULL, `device_id2` = NULL, `hw_version` = NULL, `token` = NULL WHERE `mag_id` = ".intval($rID).";");
+}
+
 function getAdminSettings() {
     global $db;
     $return = Array();
     $result = $db->query("SELECT `type`, `value` FROM `admin_settings`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $return[$row["type"]] = $row["value"];
         }
     }
@@ -76,7 +81,7 @@ function getAdminSettings() {
 function getSettings() {
     global $db;
     $result = $db->query("SELECT * FROM `settings` LIMIT 1;");
-    return XSSRow($result->fetch_assoc());
+    return $result->fetch_assoc();
 }
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -94,7 +99,7 @@ if ($rDebug) {
 }
 
 set_time_limit($rTimeout);
-ini_set('mysql.connect_timeout', $rTimeout);
+ini_set('mysql.connect_timeout', $rSQLTimeout);
 ini_set('max_execution_time', $rTimeout);
 ini_set('default_socket_timeout', $rTimeout);
 
@@ -126,6 +131,7 @@ function xor_parse($data, $key) {
 $_INFO = json_decode(xor_parse(base64_decode(file_get_contents(MAIN_DIR . "config")), CONFIG_CRYPT_KEY), True);
 if (!$db = new mysqli($_INFO["host"], $_INFO["db_user"], $_INFO["db_pass"], $_INFO["db_name"], $_INFO["db_port"])) { exit("No MySQL connection!"); } 
 $db->set_charset("utf8");
+$db->query("SET GLOBAL MAX_EXECUTION_TIME=".($rSQLTimeout*1000).";");
 date_default_timezone_set(getTimezone());
 
 $rAdminSettings = getAdminSettings();
@@ -275,7 +281,6 @@ function getStreamPIDs($rServerID) {
     $result = $db->query("SELECT `streams`.`id`, `streams`.`stream_display_name`, `streams`.`type`, `streams_sys`.`pid`, `streams_sys`.`monitor_pid`, `streams_sys`.`delay_pid` FROM `streams_sys` LEFT JOIN `streams` ON `streams`.`id` = `streams_sys`.`stream_id` WHERE `streams_sys`.`server_id` = ".intval($rServerID).";");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             foreach (Array("pid", "monitor_pid", "delay_pid") as $rPIDType) {
                 if ($row[$rPIDType]) {
                     $return[$row[$rPIDType]] = Array("id" => $row["id"], "title" => $row["stream_display_name"], "type" => $row["type"], "pid_type" => $rPIDType);
@@ -286,7 +291,6 @@ function getStreamPIDs($rServerID) {
     $result = $db->query("SELECT `id`, `stream_display_name`, `type`, `tv_archive_pid` FROM `streams` WHERE `tv_archive_server_id` = ".intval($rServerID).";");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ($row["pid"]) {
                 $return[$row["pid"]] = Array("id" => $row["id"], "title" => $row["stream_display_name"], "type" => $row["type"], "pid_type" => "timeshift");
             }
@@ -295,7 +299,6 @@ function getStreamPIDs($rServerID) {
     $result = $db->query("SELECT `streams`.`id`, `streams`.`stream_display_name`, `streams`.`type`, `user_activity_now`.`pid` FROM `user_activity_now` LEFT JOIN `streams` ON `streams`.`id` = `user_activity_now`.`stream_id` WHERE `user_activity_now`.`server_id` = ".intval($rServerID).";");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ($row["pid"]) {
                 $return[$row["pid"]] = Array("id" => $row["id"], "title" => $row["stream_display_name"], "type" => $row["type"], "pid_type" => "activity");
             }
@@ -467,7 +470,6 @@ function getStreamingServers($rActive = false) {
     }
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ($rPermissions["is_reseller"]) {
                 $row["server_name"] = "Server #".$row["id"];
             }
@@ -481,7 +483,7 @@ function getStreamingServersByID($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `streaming_servers` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return False;
 }
@@ -492,7 +494,7 @@ function getStreamList() {
     $result = $db->query("SELECT `streams`.`id`, `streams`.`stream_display_name`, `stream_categories`.`category_name` FROM `streams` LEFT JOIN `stream_categories` ON `stream_categories`.`id` = `streams`.`category_id` ORDER BY `streams`.`stream_display_name` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -504,7 +506,7 @@ function getConnections($rServerID) {
     $result = $db->query("SELECT * FROM `user_activity_now` WHERE `server_id` = '".ESC($rServerID)."';");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -516,7 +518,7 @@ function getUserConnections($rUserID) {
     $result = $db->query("SELECT * FROM `user_activity_now` WHERE `user_id` = '".ESC($rUserID)."';");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -528,7 +530,7 @@ function getEPGSources() {
     $result = $db->query("SELECT * FROM `epg`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[$row["id"]] = XSSRow($row);
+            $return[$row["id"]] = $row;
         }
     }
     return $return;
@@ -539,7 +541,6 @@ function findEPG($rEPGName) {
     $result = $db->query("SELECT `id`, `data` FROM `epg`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             foreach (json_decode($row["data"], True) as $rChannelID => $rChannelData) {
                 if ($rChannelID == $rEPGName) {
                     if (count($rChannelData["langs"]) > 0) {
@@ -561,7 +562,7 @@ function getStreamArguments() {
     $result = $db->query("SELECT * FROM `streams_arguments` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[$row["argument_key"]] = XSSRow($row);
+            $return[$row["argument_key"]] = $row;
         }
     }
     return $return;
@@ -573,7 +574,7 @@ function getTranscodeProfiles() {
     $result = $db->query("SELECT * FROM `transcoding_profiles` ORDER BY `profile_id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -589,7 +590,7 @@ function getWatchFolders($rType=null) {
     }
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -605,7 +606,7 @@ function getWatchCategories($rType=null) {
     }
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[$row["genre_id"]] = XSSRow($row);
+            $return[$row["genre_id"]] = $row;
         }
     }
     return $return;
@@ -615,7 +616,7 @@ function getWatchFolder($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `watch_folders` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -624,7 +625,7 @@ function getSeriesByTMDB($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `series` WHERE `tmdb_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -635,7 +636,7 @@ function getSeries() {
     $result = $db->query("SELECT * FROM `series` ORDER BY `title` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -645,7 +646,7 @@ function getSerie($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `series` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -684,7 +685,7 @@ function getUserAgents() {
     $result = $db->query("SELECT * FROM `blocked_user_agents` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -696,7 +697,7 @@ function getBlockedIPs() {
     $result = $db->query("SELECT * FROM `blocked_ips` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -708,7 +709,7 @@ function getRTMPIPs() {
     $result = $db->query("SELECT * FROM `rtmp_ips` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -718,7 +719,7 @@ function getStream($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `streams` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -727,7 +728,7 @@ function getUser($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `users` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -736,7 +737,7 @@ function getRegisteredUser($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `reg_users` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -745,7 +746,7 @@ function getRegisteredUserHash($rHash) {
     global $db;
     $result = $db->query("SELECT * FROM `reg_users` WHERE MD5(`username`) = '".ESC($rHash)."' LIMIT 1;");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -754,7 +755,7 @@ function getEPG($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `epg` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -765,7 +766,6 @@ function getStreamOptions($rID) {
     $result = $db->query("SELECT * FROM `streams_options` WHERE `stream_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $return[intval($row["argument_id"])] = $row;
         }
     }
@@ -778,7 +778,6 @@ function getStreamSys($rID) {
     $result = $db->query("SELECT * FROM `streams_sys` WHERE `stream_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $return[intval($row["server_id"])] = $row;
         }
     }
@@ -791,7 +790,6 @@ function getRegisteredUsers($rOwner=null, $rIncludeSelf=true) {
     $result = $db->query("SELECT * FROM `reg_users` ORDER BY `username` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ((!$rOwner) OR ($row["owner_id"] == $rOwner) OR (($row["id"] == $rOwner) && ($rIncludeSelf))) {
                 $return[intval($row["id"])] = $row;
             }
@@ -852,7 +850,7 @@ function getMemberGroups() {
     $result = $db->query("SELECT * FROM `member_groups` ORDER BY `group_id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["group_id"])] = XSSRow($row);
+            $return[intval($row["group_id"])] = $row;
         }
     }
     return $return;
@@ -862,7 +860,7 @@ function getMemberGroup($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `member_groups` WHERE `group_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -873,7 +871,6 @@ function getRegisteredUsernames() {
     $result = $db->query("SELECT `id`, `username` FROM `reg_users` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $return[intval($row["id"])] = $row["username"];
         }
     }
@@ -890,7 +887,6 @@ function getOutputs($rUser=null) {
     }
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ($rUser) {
                 $return[] = $row["access_output_id"];
             } else {
@@ -907,7 +903,7 @@ function getUserBouquets() {
     $result = $db->query("SELECT `id`, `bouquet` FROM `users` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -919,7 +915,7 @@ function getBouquets() {
     $result = $db->query("SELECT * FROM `bouquets` ORDER BY `bouquet_order` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -931,7 +927,7 @@ function getBouquetOrder() {
     $result = $db->query("SELECT * FROM `bouquets` ORDER BY `bouquet_order` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -941,7 +937,7 @@ function getBouquet($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `bouquets` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -952,7 +948,7 @@ function getLanguages() {
     $result = $db->query("SELECT * FROM `languages` ORDER BY `key` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[] = XSSRow($row);
+            $return[] = $row;
         }
     }
     return $return;
@@ -1000,7 +996,6 @@ function getPackages($rGroup=null) {
     $result = $db->query("SELECT * FROM `packages` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ((!isset($rGroup)) OR (in_array(intval($rGroup), json_decode($row["groups"], True)))) {
                 $return[intval($row["id"])] = $row;
             }
@@ -1013,7 +1008,7 @@ function getPackage($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `packages` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1022,7 +1017,7 @@ function getTranscodeProfile($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `transcoding_profiles` WHERE `profile_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1031,7 +1026,7 @@ function getUserAgent($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `blocked_user_agents` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1040,7 +1035,7 @@ function getBlockedIP($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `blocked_ips` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1049,7 +1044,7 @@ function getRTMPIP($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `rtmp_ips` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1060,7 +1055,7 @@ function getEPGs() {
     $result = $db->query("SELECT * FROM `epg` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -1076,7 +1071,7 @@ function getCategories($rType="live") {
     }
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -1088,7 +1083,7 @@ function getChannels($rType="live") {
     $result = $db->query("SELECT * FROM `stream_categories` WHERE `category_type` = '".ESC($rType)."' ORDER BY `cat_order` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -1098,7 +1093,7 @@ function getChannelsByID($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `streams` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return False;
 }
@@ -1107,7 +1102,7 @@ function getCategory($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `stream_categories` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return False;
 }
@@ -1116,10 +1111,10 @@ function getMag($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `mag_devices` WHERE `mag_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        $row = XSSRow($result->fetch_assoc());
+        $row = $result->fetch_assoc();
         $result = $db->query("SELECT `pair_id` FROM `users` WHERE `id` = ".intval($row["user_id"]).";");
         if (($result) && ($result->num_rows == 1)) {
-            $magrow = XSSRow($result->fetch_assoc());
+            $magrow = $result->fetch_assoc();
             $row["paired_user"] = $magrow["pair_id"];
             $row["username"] = getUser($row["paired_user"])["username"];
         }
@@ -1132,10 +1127,10 @@ function getEnigma($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `enigma2_devices` WHERE `device_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        $row = XSSRow($result->fetch_assoc());
+        $row = $result->fetch_assoc();
         $result = $db->query("SELECT `pair_id` FROM `users` WHERE `id` = ".intval($row["user_id"]).";");
         if (($result) && ($result->num_rows == 1)) {
-            $e2row = XSSRow($result->fetch_assoc());
+            $e2row = $result->fetch_assoc();
             $row["paired_user"] = $e2row["pair_id"];
             $row["username"] = getUser($row["paired_user"])["username"];
         }
@@ -1148,7 +1143,7 @@ function getMAGUser($rID) {
     global $db;
     $result = $db->query("SELECT `mac` FROM `mag_devices` WHERE `user_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow(base64_decode($result->fetch_assoc()["mac"]));
+        return base64_decode($result->fetch_assoc()["mac"]);
     }
     return "";
 }
@@ -1157,7 +1152,7 @@ function getE2User($rID) {
     global $db;
     $result = $db->query("SELECT `mac` FROM `enigma2_devices` WHERE `user_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc()["mac"]);
+        return $result->fetch_assoc()["mac"];
     }
     return "";
 }
@@ -1166,12 +1161,11 @@ function getTicket($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `tickets` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows > 0)) {
-        $row = XSSRow($result->fetch_assoc());
+        $row = $result->fetch_assoc();
         $row["replies"] = Array();
         $row["title"] = htmlspecialchars($row["title"]);
         $result = $db->query("SELECT * FROM `tickets_replies` WHERE `ticket_id` = ".intval($rID)." ORDER BY `date` ASC;");
         while ($reply = $result->fetch_assoc()) {
-            $reply = XSSRow($reply);
             // Hack to fix display issues on short text.
             $reply["message"] = htmlspecialchars($reply["message"]);
             if (strlen($reply["message"]) < 80) {
@@ -1192,7 +1186,7 @@ function getExpiring($rID) {
 	$result = $db->query("SELECT `id`, `member_id`, `username`, `password`, `exp_date` FROM `users` WHERE `member_id` IN (".ESC(join(",", $rAvailableMembers)).") AND `exp_date` >= UNIX_TIMESTAMP() AND `is_mag` = 0 AND `is_e2` = 0 AND `is_stalker` = 0 ORDER BY `exp_date` ASC LIMIT 100;");
 	if (($result) && ($result->num_rows > 0)) {
 		while ($row = $result->fetch_assoc()) {
-			$return[] = XSSRow($row);
+			$return[] = $row;
 		}
 	}
 	return $return;
@@ -1208,15 +1202,14 @@ function getTickets($rID=null) {
     }
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $dateresult = $db->query("SELECT MIN(`date`) AS `date` FROM `tickets_replies` WHERE `ticket_id` = ".intval($row["id"])." AND `admin_reply` = 0;");
-            if ($rDate = XSS($dateresult->fetch_assoc()["date"])) {
+            if ($rDate = $dateresult->fetch_assoc()["date"]) {
                 $row["created"] = date("Y-m-d H:i", $rDate);
             } else {
                 $row["created"] = "";
             }
             $dateresult = $db->query("SELECT MAX(`date`) AS `date` FROM `tickets_replies` WHERE `ticket_id` = ".intval($row["id"])." AND `admin_reply` = 1;");
-            if ($rDate = XSS($dateresult->fetch_assoc()["date"])) {
+            if ($rDate = $dateresult->fetch_assoc()["date"]) {
                 $row["last_reply"] = date("Y-m-d H:i", $rDate);
             } else {
                 $row["last_reply"] = "";
@@ -1283,7 +1276,7 @@ function getPermissions($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `member_groups` WHERE `group_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1292,7 +1285,7 @@ function doLogin($rUsername, $rPassword) {
     global $db;
     $result = $db->query("SELECT `id`, `username`, `password`, `member_group_id`, `google_2fa_sec`, `status` FROM `reg_users` WHERE `username` = '".ESC($rUsername)."' LIMIT 1;");
     if (($result) && ($result->num_rows == 1)) {
-        $rRow = XSSRow($result->fetch_assoc());
+        $rRow = $result->fetch_assoc();
         if (cryptPassword($rPassword) == $rRow["password"]) {
             return $rRow;
         }
@@ -1306,7 +1299,7 @@ function getSubresellerSetups() {
     $result = $db->query("SELECT * FROM `subreseller_setup` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -1316,7 +1309,7 @@ function getSubresellerSetup($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `subreseller_setup` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return XSSRow($result->fetch_assoc());
+        return $result->fetch_assoc();
     }
     return null;
 }
@@ -1327,7 +1320,7 @@ function getEpisodeParents() {
     $result = $db->query("SELECT `series_episodes`.`stream_id`, `series`.`id`, `series`.`title` FROM `series_episodes` LEFT JOIN `series` ON `series`.`id` = `series_episodes`.`series_id`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["stream_id"])] = XSSRow($row);
+            $return[intval($row["stream_id"])] = $row;
         }
     }
     return $return;
@@ -1339,7 +1332,7 @@ function getSeriesList() {
     $result = $db->query("SELECT `id`, `title` FROM `series` ORDER BY `title` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $return[intval($row["id"])] = XSSRow($row);
+            $return[intval($row["id"])] = $row;
         }
     }
     return $return;
@@ -1425,7 +1418,7 @@ function updateSeries($rID) {
     require_once("tmdb.php");
     $result = $db->query("SELECT `tmdb_id` FROM `series` WHERE `id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        $rTMDBID = XSS($result->fetch_assoc()["tmdb_id"]);
+        $rTMDBID = $result->fetch_assoc()["tmdb_id"];
         if (strlen($rTMDBID) > 0) {
             if (strlen($rAdminSettings["tmdb_language"]) > 0) {
                 $rTMDB = new TMDB($rSettings["tmdb_api_key"], $rAdminSettings["tmdb_language"]);
@@ -1552,7 +1545,6 @@ function generateSeriesPlaylist($rSeriesNo) {
     $result = $db->query("SELECT `stream_id` FROM `series_episodes` WHERE `series_id` = ".intval($rSeriesNo)." ORDER BY `season_num` ASC, `sort` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $resultB = $db->query("SELECT `stream_source` FROM `streams` WHERE `id` = ".intval($row["stream_id"]).";");
             if (($resultB) && ($resultB->num_rows > 0)) {
                 $rSource = json_decode($resultB->fetch_assoc()["stream_source"], True)[0];
@@ -1664,7 +1656,6 @@ function updateTMDbCategories() {
     $rResult = $db->query("SELECT `id`, `type`, `genre_id` FROM `watch_categories`;");
     if (($rResult) && ($rResult->num_rows > 0)) {
         while ($rRow = $rResult->fetch_assoc()) {
-            $rRow = XSSRow($rRow);
 			if (in_array($rRow["genre_id"], $rCurrentCats[$rRow["type"]])) {
 				$db->query("DELETE FROM `watch_categories` WHERE `id` = ".intval($rRow["id"]).";");
 			}
@@ -1708,6 +1699,8 @@ if (file_exists("/home/xtreamcodes/iptv_xtream_codes/admin/.update")) {
     }
 }
 
+$_GET = XSSRow($_GET); $_POST = XSSRow($_POST); // Parse user input.
+
 if (isset($_SESSION['hash'])) {
     $rUserInfo = getRegisteredUserHash($_SESSION['hash']);
     $rAdminSettings["dark_mode"] = $rUserInfo["dark_mode"];
@@ -1736,6 +1729,4 @@ if (isset($_SESSION['hash'])) {
         }
     }
 }
-
-$_GET = XSSRow($_GET); $_POST = XSSRow($_POST); // Parse user input.
 ?>

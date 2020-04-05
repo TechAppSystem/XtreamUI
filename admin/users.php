@@ -142,7 +142,6 @@ if ($rSettings["sidebar"]) {
                                     $result = $db->query("SELECT * FROM `devices` ORDER BY `device_id` ASC;");
                                     if (($result) && ($result->num_rows > 0)) {
                                         while ($row = $result->fetch_assoc()) {
-                                            $row = XSSRow($row);
                                             if ($row["copy_text"]) {
                                                 echo '<optgroup label="'.$row["device_name"].'"><option data-text="'.str_replace('"', '\"', $row["copy_text"]).'" value="type='.$row["device_key"].'&amp;output=hls">'.$row["device_name"].' - HLS </option><option data-text="'.str_replace('"', '\"', $row["copy_text"]).'" value="type='.$row["device_key"].'&amp;output=mpegts">'.$row["device_name"].' - MPEGTS</option></optgroup>';
                                             } else {

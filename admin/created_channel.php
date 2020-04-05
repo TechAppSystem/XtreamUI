@@ -84,7 +84,6 @@ if (isset($_POST["submit_stream"])) {
                 $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                 if (($result) && ($result->num_rows > 0)) {
                     while ($row = $result->fetch_assoc()) {
-                        $row = XSSRow($row);
                         $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                     }
                 }
@@ -248,16 +247,17 @@ if ($rSettings["sidebar"]) {
                                         <tr>
                                             <th></th>
                                             <th></th>
-                                            <th>Server</th>
+                                            <th></th>
+                                            <th>Source</th>
                                             <th>Clients</th>
-                                            <th>Status</th>
+                                            <th>Uptime</th>
                                             <th>Actions</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td colspan="7" class="text-center">Loading channel information...</td>
+                                            <td colspan="8" class="text-center">Loading channel information...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1058,8 +1058,8 @@ if ($rSettings["sidebar"]) {
                     }
                 },
                 columnDefs: [
-                    {"className": "dt-center", "targets": [2,3,4,5]},
-                    {"visible": false, "targets": [0,1,6,7]}
+                    {"className": "dt-center", "targets": [3,4,5,6]},
+                    {"visible": false, "targets": [0,1,2,7]}
                 ],
             });
             setTimeout(reloadStream, 5000);

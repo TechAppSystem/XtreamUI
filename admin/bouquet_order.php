@@ -29,7 +29,6 @@ if (is_array($rChannels)) {
     $result = $db->query("SELECT `streams`.`id`, `streams`.`type`, `streams`.`category_id`, `streams`.`stream_display_name`, `stream_categories`.`category_name` FROM `streams`, `stream_categories` WHERE `streams`.`category_id` = `stream_categories`.`id` AND `streams`.`id` IN (".ESC(join(",", $rChannels)).");");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if ($row["type"] == 2) {
 				$rListings["movie"][intval($row["id"])] = $row;
             } else if ($row["type"] == 4) {
@@ -44,7 +43,6 @@ if (is_array($rSeries)) {
     $result = $db->query("SELECT `series`.`id`, `series`.`category_id`, `series`.`title`, `stream_categories`.`category_name` FROM `series`, `stream_categories` WHERE `series`.`category_id` = `stream_categories`.`id` AND `series`.`id` IN (".ESC(join(",", $rSeries)).");");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             $rListings["series"][intval($row["id"])] = $row;
         }
     }

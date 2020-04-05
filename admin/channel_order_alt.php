@@ -19,7 +19,6 @@ $rOrdered = Array();
 $result = $db->query("SELECT `id`, `type`, `stream_display_name`, `category_id` FROM `streams` ORDER BY `order` ASC, `stream_display_name` ASC;");
 if (($result) && ($result->num_rows > 0)) {
     while ($row = $result->fetch_assoc()) {
-        $row = XSSRow($row);
         $rOrdered[$row["category_id"]][] = Array("id" => $row["id"], "value" => $row["stream_display_name"]);
     }
 }

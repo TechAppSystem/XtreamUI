@@ -1,6 +1,12 @@
 <?php
 include "functions.php";
 if (!isset($_SESSION['hash'])) { exit; }
+
+set_time_limit($rSQLTimeout);
+ini_set('mysql.connect_timeout', $rSQLTimeout);
+ini_set('max_execution_time', $rSQLTimeout);
+ini_set('default_socket_timeout', $rSQLTimeout);
+
 $rStatusArray = Array(0 => "<button type='button' class='btn btn-outline-warning btn-rounded btn-xs waves-effect waves-light'>STOPPED</button>", 1 => "RUNNING", 2 => "<button type='button' class='btn btn-outline-primary btn-rounded btn-xs waves-effect waves-light'>STARTING</button>", 3 => "<button type='button' class='btn btn-outline-danger btn-rounded btn-xs waves-effect waves-light'><i class='mdi mdi-checkbox-blank-circle'></i> DOWN</button>", 4 => "<button type='button' class='btn btn-outline-pink btn-rounded btn-xs waves-effect waves-light'>ON DEMAND</button>", 5 => "<button type='button' class='btn btn-outline-purple btn-rounded btn-xs waves-effect waves-light'>DIRECT</button>", 6 => "<button type='button' class='btn btn-outline-warning btn-rounded btn-xs waves-effect waves-light'>CREATING...</button>");
 $rVODStatusArray = Array(0 => "<i class='text-dark mdi mdi-checkbox-blank-circle-outline'></i>", 1 => "<i class='text-success mdi mdi-check-circle'></i>", 2 => "<i class='text-warning mdi mdi-checkbox-blank-circle'></i>", 3 => "<i class='text-primary mdi mdi-web'></i>", 4 => "<i class='text-danger mdi mdi-triangle'></i>");
 $rWatchStatusArray = Array(1 => "<button type='button' class='btn btn-outline-success btn-rounded btn-xs waves-effect waves-light'>ADDED</button>", 2 => "<button type='button' class='btn btn-outline-danger btn-rounded btn-xs waves-effect waves-light'>SQL FAILED</button>", 3 => "<button type='button' class='btn btn-outline-danger btn-rounded btn-xs waves-effect waves-light'>NO CATEGORY</button>", 4 => "<button type='button' class='btn btn-outline-danger btn-rounded btn-xs waves-effect waves-light'>NO TMDb MATCH</button>", 5 => "<button type='button' class='btn btn-outline-danger btn-rounded btn-xs waves-effect waves-light'>INVALID FILE</button>");
@@ -78,7 +84,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -242,7 +247,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -301,7 +305,7 @@ if ($rType == "users") {
                 }
                 if ($rPermissions["is_admin"]) {
 					if (hasPermissions("adv", "manage_events")) {
-						$rButtons .= '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="Send MAG Event" type="button" class="btn btn-outline-pink waves-effect waves-light btn-xs" onClick="message('.$rRow["mag_id"].', \''.base64_decode($rRow["mac"]).'\');"><i class="mdi mdi-message-alert"></i></button>
+						$rButtons .= '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="MAG Event" type="button" class="btn btn-outline-pink waves-effect waves-light btn-xs" onClick="message('.$rRow["mag_id"].', \''.base64_decode($rRow["mac"]).'\');"><i class="mdi mdi-message-alert"></i></button>
 						';
 					}
 					if (hasPermissions("adv", "edit_mag")) {
@@ -394,7 +398,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if (!$rRow["admin_enabled"]) {
@@ -553,7 +556,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -803,7 +805,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -1011,7 +1012,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rCategory = $rRow["category_name"] ?: "No Category";
@@ -1173,7 +1173,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rActualStatus = 0;
                 if (intval($rRow["direct_source"]) == 1) {
                     // Direct
@@ -1250,7 +1249,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if ($rPermissions["is_admin"]) {
@@ -1341,7 +1339,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 if ($rRow["divergence"] <= 10) {
@@ -1450,7 +1447,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rStatus);
             }
         }
@@ -1510,7 +1506,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rActualStatus = 0;
                 if (intval($rRow["direct_source"]) == 1) {
                     // Direct
@@ -1586,7 +1581,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rStatus);
             }
         }
@@ -1634,7 +1628,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["title"], $rRow["category_name"]);
             }
         }
@@ -1691,7 +1684,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_reguser")) {
 					$rOwner = "<a href='./reg_user.php?id=".$rRow["admin_id"]."'>".$rRow["owner_username"]."</a>";
 					$rTarget = "<a href='./reg_user.php?id=".$rRow["target_id"]."'>".$rRow["target_username"]."</a>";
@@ -1707,7 +1699,7 @@ if ($rType == "users") {
 } else if ($rType == "user_ips") {
 	if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "connection_logs"))) { exit; }
     $rReturn = Array("draw" => $_GET["draw"], "recordsTotal" => 0, "recordsFiltered" => 0, "data" => Array());
-    $rOrder = Array(false);
+    $rOrder = Array("`user_activity`.`user_id`", "`users`.`username`", "`ip_count`", false);
     if (strlen($_GET["order"][0]["column"]) > 0) {
         $rOrderRow = intval($_GET["order"][0]["column"]);
     } else {
@@ -1735,7 +1727,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rDates = date("Y-m-d", time()-intval($_GET["range"]))." - ".date("Y-m-d", time());
                 $rButtons = '<a href="./user_activity.php?search='.$rRow["username"].'&dates='.$rDates.'"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs">View Logs</button></a>
                 ';
@@ -1795,7 +1786,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_user")) {
 					$rUsername = "<a href='./user.php?id=".$rRow["user_id"]."'>".$rRow["username"]."</a>";
 				} else {
@@ -1857,7 +1847,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				if (hasPermissions("adv", "edit_reguser")) {
 					$rOwner = "<a href='./reg_user.php?id=".$rRow["owner_id"]."'>".$rRow["owner"]."</a>";
 				} else {
@@ -1919,7 +1908,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["server_name"], $rRow["error"], $rRow["date"]);
             }
         }
@@ -1965,7 +1953,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 $rReturn["data"][] = Array($rRow["id"], $rRow["stream_display_name"], $rRow["category_name"], $rRow["active_count"], "<button type='button' class='btn btn-outline-danger waves-effect waves-light btn-xs' href='javascript:void(0);' onClick='selectFingerprint(".$rRow["id"].")'><i class='mdi mdi-fingerprint'></i></button>");
             }
         }
@@ -2021,7 +2008,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				$rButtons = "";
                 if ($rRow["status"] == 1) {
                     $rStatus = '<i class="text-success fas fa-circle"></i>';
@@ -2112,7 +2098,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				$rButtons = "";
 				if (hasPermissions("adv", "add_episode")) {
 					$rButtons .= '<a href="./episode.php?sid='.$rRow["id"].'"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="Add Episode(s)" type="button" class="btn btn-outline-primary waves-effect waves-light btn-xs"><i class="mdi mdi-plus-circle-outline"></i></button></a>
@@ -2205,7 +2190,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
                 // Format Rows
 				$rButtons = "";
                 $rSeriesName = $rRow["title"]." - Season ".$rRow["season_num"];
@@ -2373,7 +2357,6 @@ if ($rType == "users") {
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				$rButtons = "";
                 if ($rRow["stream_id"] > 0) {
                     if ($rRow["type"] == 1) {

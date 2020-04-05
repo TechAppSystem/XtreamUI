@@ -80,7 +80,6 @@ if (isset($_POST["submit_movie"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` = 2;");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
-                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = $rSource;
@@ -120,7 +119,6 @@ if (isset($_POST["submit_movie"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` = 2;");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
-                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = $rSource;
@@ -214,7 +212,6 @@ if (isset($_POST["submit_movie"])) {
                     $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                     if (($result) && ($result->num_rows > 0)) {
                         while ($row = $result->fetch_assoc()) {
-                            $row = XSSRow($row);
                             $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                         }
                     }

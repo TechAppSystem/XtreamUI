@@ -132,7 +132,6 @@ if (isset($_POST["submit_stream"])) {
         $result = $db->query("SELECT `stream_source` FROM `streams` WHERE `type` IN (1,3);");
         if (($result) && ($result->num_rows > 0)) {
             while ($row = $result->fetch_assoc()) {
-                $row = XSSRow($row);
                 foreach (json_decode($row["stream_source"], True) as $rSource) {
                     if (strlen($rSource) > 0) {
                         $rStreamDatabase[] = str_replace(" ", "%20", $rSource);
@@ -237,7 +236,6 @@ if (isset($_POST["submit_stream"])) {
                     $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                     if (($result) && ($result->num_rows > 0)) {
                         while ($row = $result->fetch_assoc()) {
-                            $row = XSSRow($row);
                             $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                         }
                     }
@@ -463,7 +461,7 @@ if ($rSettings["sidebar"]) {
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td colspan="7" class="text-center">Loading stream information...</td>
+                                            <td colspan="8" class="text-center">Loading stream information...</td>
                                         </tr>
                                     </tbody>
                                 </table>

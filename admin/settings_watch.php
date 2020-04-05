@@ -53,7 +53,7 @@ $rBouquets = getBouquets();
 
 $rResult = $db->query("SELECT * FROM `watch_settings`;");
 if (($rResult) && ($rResult->num_rows == 1)) {
-    $rWatchSettings = XSSRow($rResult->fetch_assoc());
+    $rWatchSettings = $rResult->fetch_assoc();
 }
 
 if ($rSettings["sidebar"]) {
@@ -185,7 +185,7 @@ if ($rSettings["sidebar"]) {
                                                             Select a Category and/or Bouquet to apply to each Genre. The first Genre of each movie will be used for allocation.
                                                         </p>
                                                         <?php $rResult = $db->query("SELECT * FROM `watch_categories` WHERE `type` = 1 ORDER BY `genre` ASC;");
-                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { $rRow = XSSRow($rRow); ?>
+                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { ?>
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-2 col-form-label" for="genre_<?=$rRow["genre_id"]?>"><?=$rRow["genre"]?></label>
                                                             <div class="col-md-4">
@@ -221,7 +221,7 @@ if ($rSettings["sidebar"]) {
                                                             Select a Category and/or Bouquet to apply to each Genre. The first Genre of each movie will be used for allocation.
                                                         </p>
                                                         <?php $rResult = $db->query("SELECT * FROM `watch_categories` WHERE `type` = 2 ORDER BY `genre` ASC;");
-                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { $rRow = XSSRow($rRow); ?>
+                                                        if (($rResult) && ($rResult->num_rows > 0)) { while ($rRow = $rResult->fetch_assoc()) { ?>
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-2 col-form-label" for="genretv_<?=$rRow["genre_id"]?>"><?=$rRow["genre"]?></label>
                                                             <div class="col-md-4">

@@ -112,7 +112,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `pid`, `server_id` FROM `user_activity_now` WHERE `user_id` = ".intval($rUserID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     sexec($rRow["server_id"], "kill -9 ".$rRow["pid"]);
                 }
             }
@@ -132,7 +131,7 @@ if (isset($_GET["action"])) {
         if ($rSub == "kill") {
             $rResult = $db->query("SELECT `server_id` FROM `user_activity_now` WHERE `pid` = ".intval($rPID)." LIMIT 1;");
             if (($rResult) && ($rResult->num_rows == 1)) {
-                sexec(XSS($rResult->fetch_assoc()["server_id"]), "kill -9 ".$rPID);
+                sexec($rResult->fetch_assoc()["server_id"], "kill -9 ".$rPID);
                 echo json_encode(Array("result" => True));exit;
             }
         }
@@ -266,7 +265,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `series_episodes` WHERE `series_id` = ".intval($rSeriesID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     $db->query("DELETE FROM `streams_sys` WHERE `stream_id` = ".intval($rRow["stream_id"]).";");
                     $db->query("DELETE FROM `streams` WHERE `id` = ".intval($rRow["stream_id"]).";");
                     deleteMovieFile($rServerID, $rStreamID);
@@ -306,7 +304,7 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `ip` FROM `blocked_ips` WHERE `id` = ".intval($rIPID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 foreach ($rServers as $rServer) {
-                    sexec($rServer["id"], "sudo /sbin/iptables -D INPUT -s ".XSS($rResult->fetch_assoc()["ip"])." -j DROP");
+                    sexec($rServer["id"], "sudo /sbin/iptables -D INPUT -s ".$rResult->fetch_assoc()["ip"]." -j DROP");
                 }
             }
             $db->query("DELETE FROM `blocked_ips` WHERE `id` = ".intval($rIPID).";");
@@ -380,7 +378,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `pid`, `server_id` FROM `user_activity_now` WHERE `server_id` = ".intval($rServerID).";");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     sexec($rRow["server_id"], "kill -9 ".$rRow["pid"]);
                 }
             }
@@ -390,7 +387,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `streams_sys` WHERE `server_id` = ".intval($rServerID)." AND `on_demand` = 0;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     $rStreamIDs[] = intval($rRow["stream_id"]);
                 }
             }
@@ -403,7 +399,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `stream_id` FROM `streams_sys` WHERE `server_id` = ".intval($rServerID)." AND `on_demand` = 0;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     $rStreamIDs[] = intval($rRow["stream_id"]);
                 }
             }
@@ -465,7 +460,7 @@ if (isset($_GET["action"])) {
         $rOverride = json_decode($rUserInfo["override_packages"], True);
         $rResult = $db->query("SELECT `id`, `bouquets`, `official_credits` AS `cost_credits`, `official_duration`, `official_duration_in`, `max_connections`, `can_gen_mag`, `can_gen_e2`, `only_mag`, `only_e2` FROM `packages` WHERE `id` = ".intval($_GET["package_id"]).";");
         if (($rResult) && ($rResult->num_rows == 1)) {
-            $rData = XSSRow($rResult->fetch_assoc());
+            $rData = $rResult->fetch_assoc();
             if ((isset($rOverride[$rData["id"]]["official_credits"])) && (strlen($rOverride[$rData["id"]]["official_credits"]) > 0)) {
                 $rData["cost_credits"] = $rOverride[$rData["id"]]["official_credits"];
             }
@@ -482,7 +477,7 @@ if (isset($_GET["action"])) {
             foreach (json_decode($rData["bouquets"], True) as $rBouquet) {
                 $rResult = $db->query("SELECT * FROM `bouquets` WHERE `id` = ".intval($rBouquet).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rRow = XSSRow($rResult->fetch_assoc());
+                    $rRow = $rResult->fetch_assoc();
                     $rReturn[] = Array("id" => $rRow["id"], "bouquet_name" => $rRow["bouquet_name"], "bouquet_channels" => json_decode($rRow["bouquet_channels"], True), "bouquet_series" => json_decode($rRow["bouquet_series"], True));
                 }
             }
@@ -495,12 +490,12 @@ if (isset($_GET["action"])) {
         $rReturn = Array();
         $rResult = $db->query("SELECT `bouquets`, `trial_credits` AS `cost_credits`, `trial_duration`, `trial_duration_in`, `max_connections`, `can_gen_mag`, `can_gen_e2`, `only_mag`, `only_e2` FROM `packages` WHERE `id` = ".intval($_GET["package_id"]).";");
         if (($rResult) && ($rResult->num_rows == 1)) {
-            $rData = XSSRow($rResult->fetch_assoc());
+            $rData = $rResult->fetch_assoc();
             $rData["exp_date"] = date('Y-m-d', strtotime('+'.intval($rData["trial_duration"]).' '.$rData["trial_duration_in"]));
             foreach (json_decode($rData["bouquets"], True) as $rBouquet) {
                 $rResult = $db->query("SELECT * FROM `bouquets` WHERE `id` = ".intval($rBouquet).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rRow = XSSRow($rResult->fetch_assoc());
+                    $rRow = $rResult->fetch_assoc();
                     $rReturn[] = Array("id" => $rRow["id"], "bouquet_name" => $rRow["bouquet_name"], "bouquet_channels" => json_decode($rRow["bouquet_channels"], True), "bouquet_series" => json_decode($rRow["bouquet_series"], True));
                 }
             }
@@ -525,7 +520,6 @@ if (isset($_GET["action"])) {
 		$rResult = $db->query("SELECT `type`, `time`, `count` FROM `dashboard_statistics` WHERE `time` >= ".intval($rMin)." AND `time` <= ".intval($rMax)." AND `type` = 'conns';");
 		if (($rResult) && ($rResult->num_rows > 0)) {
 			while ($rRow = $rResult->fetch_assoc()) {
-                $rRow = XSSRow($rRow);
 				$rStatistics[$rRow["type"]][] = Array(intval($rRow["time"]) * 1000, intval($rRow["count"]));
 			}
 		}
@@ -619,7 +613,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"] as $rStreamID) {
                 $rResult = $db->query("SELECT `id`, `stream_display_name`, `stream_source` FROM `streams` WHERE `id` = ".intval($rStreamID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = XSSRow($rResult->fetch_assoc());
+                    $rData = $rResult->fetch_assoc();
                     $return["streams"][] = $rData;
                 }
             }
@@ -632,7 +626,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"]["stream"] as $rStreamID) {
                 $rResult = $db->query("SELECT `id`, `stream_display_name`, `type` FROM `streams` WHERE `id` = ".intval($rStreamID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = XSSRow($rResult->fetch_assoc());
+                    $rData = $rResult->fetch_assoc();
                     if ($rData["type"] == 2) {
                         $return["vod"][] = $rData;
                     } else if ($rData["type"] == 4) {
@@ -647,7 +641,7 @@ if (isset($_GET["action"])) {
             foreach ($_POST["data"]["series"] as $rSeriesID) {
                 $rResult = $db->query("SELECT `id`, `title` FROM `series` WHERE `id` = ".intval($rSeriesID).";");
                 if (($rResult) && ($rResult->num_rows == 1)) {
-                    $rData = XSSRow($rResult->fetch_assoc());
+                    $rData = $rResult->fetch_assoc();
                     $return["series"][] = $rData;
                 }
             }
@@ -667,7 +661,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `id`, `username` FROM `users` WHERE `username` LIKE '%".ESC($_GET["search"])."%' AND `is_e2` = 0 AND `is_mag` = 0 ORDER BY `username` ASC LIMIT ".(($rPage-1) * 100).", 100;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     $return["items"][] = Array("id" => $rRow["id"], "text" => $rRow["username"]);
                 }
             }
@@ -687,7 +680,6 @@ if (isset($_GET["action"])) {
             $rResult = $db->query("SELECT `id`, `stream_display_name` FROM `streams` WHERE `stream_display_name` LIKE '%".ESC($_GET["search"])."%' ORDER BY `stream_display_name` ASC LIMIT ".(($rPage-1) * 100).", 100;");
             if (($rResult) && ($rResult->num_rows > 0)) {
                 while ($rRow = $rResult->fetch_assoc()) {
-                    $rRow = XSSRow($rRow);
                     $return["items"][] = Array("id" => $rRow["id"], "text" => $rRow["stream_display_name"]);
                 }
             }
@@ -787,7 +779,6 @@ if (isset($_GET["action"])) {
                 ini_set('max_execution_time', 360);
                 ini_set('default_socket_timeout', 15);
                 while ($row = $result->fetch_assoc()) {
-                    $row = XSSRow($row);
                     if (in_array($row["server_id"], $rActiveServers)) {
                         $rArray = Array("font_size" => $rData["font_size"], "font_color" => $rData["font_color"], "xy_offset" => $rData["xy_offset"], "message" => "", "activity_id" => $row["activity_id"]);
                         if ($rData["type"] == 1) {
@@ -895,6 +886,9 @@ if (isset($_GET["action"])) {
                 $rData["need_confirm"] = 0;
                 $rData["reboot_portal"] = 0;
                 $rData["message"] = intval($rData["channel"]);
+            } else if ($rData["type"] == "reset_stb_lock") {
+                resetSTB($rData["id"]);
+                echo json_encode(Array("result" => True));exit;
             } else {
                 $rData["need_confirm"] = 0;
                 $rData["reboot_portal"] = 0;

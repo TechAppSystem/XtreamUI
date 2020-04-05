@@ -150,6 +150,7 @@ if ($rSettings["sidebar"]) {
 									<option value="reboot"><?=$_["reboot_device"]?></option>
 									<option value="send_msg"><?=$_["send_message"]?></option>
 									<option value="cut_off"><?=$_["close_portal"]?></option>
+                                    <option value="reset_stb_lock"><?=$_["reset_stb_lock"]?></option>
 								</optgroup>
 							</select>
 						</div>

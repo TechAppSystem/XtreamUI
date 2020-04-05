@@ -16,7 +16,7 @@ if (isset($_GET["geolite2"])) {
 
 if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
     $rArray = getSettings();
-    foreach (Array("disallow_empty_user_agents", "persistent_connections", "show_all_category_mag", "show_not_on_air_video", "show_banned_video", "show_expired_video", "new_sorting_bouquet", "rtmp_random", "use_buffer", "audio_restart_loss", "save_closed_connection", "client_logs_save", "case_sensitive_line", "county_override_1st", "disallow_2nd_ip_con", "firewall", "use_mdomain_in_lists", "hash_lb", "mag_security", "always_enabled_subtitles", "enable_connection_problem_indication", "show_tv_channel_logo", "show_channel_logo_in_preview", "stb_change_pass", "enable_debug_stalker") as $rSetting) {
+    foreach (Array("disallow_empty_user_agents", "persistent_connections", "show_all_category_mag", "show_not_on_air_video", "show_banned_video", "show_expired_video", "new_sorting_bouquet", "rtmp_random", "use_buffer", "audio_restart_loss", "save_closed_connection", "client_logs_save", "case_sensitive_line", "county_override_1st", "disallow_2nd_ip_con", "firewall", "use_mdomain_in_lists", "hash_lb", "show_isps", "mag_security", "always_enabled_subtitles", "enable_connection_problem_indication", "show_tv_channel_logo", "show_channel_logo_in_preview", "stb_change_pass", "enable_debug_stalker") as $rSetting) {
         if (isset($_POST[$rSetting])) {
             $rArray[$rSetting] = 1;
             unset($_POST[$rSetting]);
@@ -957,7 +957,7 @@ if ($rSettings["sidebar"]) {
                                                         <?php }
                                                         $result = $db->query("SELECT `username`, `reseller_dns` FROM `reg_users` WHERE `reseller_dns` <> '' AND `verified` = 1 ORDER BY `username` ASC;");
                                                         if (($result) && ($result->num_rows > 0)) {
-                                                        while ($row = $result->fetch_assoc()) { $row = XSSRow($row); ?>
+                                                        while ($row = $result->fetch_assoc()) { ?>
                                                         <tr>
                                                             <td><?=$row["username"]?></td>
                                                             <td><?=$row["reseller_dns"]?></td>

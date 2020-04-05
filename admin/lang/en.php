@@ -119,6 +119,7 @@ $_ = Array(
     "reboot_device" => "Reboot Device",
     "send_message" => "Send Message",
     "close_portal" => "Close Portal",
+    "reset_stb_lock" => "Reset STB Lock",
     "reboot_on_confirmation" => "Reboot Portal on Confirmation",
     "enter_a_custom_message" => "Enter a custom message",
     "channel" => "Channel",

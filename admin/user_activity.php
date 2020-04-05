@@ -30,20 +30,12 @@ if ($rSettings["sidebar"]) {
                                         <button type="button" class="btn btn-info waves-effect waves-light btn-sm btn-clear-logs">
                                             <i class="mdi mdi-minus"></i> Clear Logs
                                         </button>
-                                        <?php }
-                                        if (!$detect->isMobile()) { ?>
-                                        <a href="#" onClick="toggleAuto();" style="margin-right:10px;">
-                                            <button type="button" class="btn btn-dark waves-effect waves-light btn-sm">
-                                                <i class="mdi mdi-refresh"></i> <span class="auto-text">Auto-Refresh</span>
-                                            </button>
-                                        </a>
-                                        <?php } else { ?>
+                                        <?php } ?>
                                         <a href="javascript:location.reload();" onClick="toggleAuto();" style="margin-right:10px;">
                                             <button type="button" class="btn btn-dark waves-effect waves-light btn-sm">
                                                 <i class="mdi mdi-refresh"></i> Refresh
                                             </button>
                                         </a>
-                                        <?php } ?>
                                     </li>
                                 </ol>
                             </div>
@@ -167,25 +159,7 @@ if ($rSettings["sidebar"]) {
 
         <!-- Datatables init -->
         <script>
-        var autoRefresh = true;
         var rClearing = false;
-        
-        function toggleAuto() {
-            if (autoRefresh == true) {
-                autoRefresh = false;
-                $(".auto-text").html("Manual Mode");
-            } else {
-                autoRefresh = true;
-                $(".auto-text").html("Auto-Refresh");
-            }
-        }
-        
-        function reloadUsers() {
-            if (autoRefresh == true) {
-                $("#datatable-activity").DataTable().ajax.reload(null, false);
-            }
-            setTimeout(reloadUsers, 2000);
-        }
         
         function getServer() {
             return $("#act_filter").val();
@@ -326,13 +300,7 @@ if ($rSettings["sidebar"]) {
                     $("#datatable-activity").DataTable().ajax.reload( null, false );
                 }
             })
-            <?php if (!$detect->isMobile()) { ?>
-            setTimeout(reloadUsers, 5000);
-            <?php }
-            if (!$rAdminSettings["auto_refresh"]) { ?>
-            toggleAuto();
-            <?php }
-            if (isset($_GET["search"])) { ?>
+            <?php if (isset($_GET["search"])) { ?>
             $("#act_search").val("<?=str_replace('"', '\"', $_GET["search"])?>").trigger('change');
             <?php } if (isset($_GET["dates"])) { ?>
             $("#act_range").val("<?=str_replace('"', '\"', $_GET["dates"])?>").trigger('change');

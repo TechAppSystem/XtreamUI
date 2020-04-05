@@ -14,14 +14,12 @@ if (isset($_POST["replace_dns"])) {
 	$result = $db->query("SELECT `id` FROM `streams_sys` WHERE `server_id` = ".intval($rReplacement).";");
 	if (($result) && ($result->num_rows > 0)) {
 		while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
 			$rExisting[] = intval($row["id"]);
 		}
 	}
 	$result = $db->query("SELECT `id` FROM `streams_sys` WHERE `server_id` = ".intval($rSource).";");
 	if (($result) && ($result->num_rows > 0)) {
 		while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
 			if (in_array(intval($row["id"]), $rExisting)) {
 				$db->query("DELETE FROM `streams_sys` WHERE `id` = ".intval($row["id"]).";");
 			}
@@ -39,7 +37,6 @@ if (isset($_POST["replace_dns"])) {
     $result = $db->query("SELECT `server_stream_id`, `stream_id` FROM `streams_sys`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if (!in_array(intval($row["stream_id"]), $rStreamArray)) {
                 $rDelete[] = $row["server_stream_id"];
             }
@@ -52,7 +49,6 @@ if (isset($_POST["replace_dns"])) {
     $result = $db->query("SELECT `id`, `stream_id` FROM `client_logs`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if (!in_array(intval($row["stream_id"]), $rStreamArray)) {
                 $rDelete[] = $row["id"];
             }
@@ -65,7 +61,6 @@ if (isset($_POST["replace_dns"])) {
     $result = $db->query("SELECT `id`, `stream_id` FROM `stream_logs`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if (!in_array(intval($row["stream_id"]), $rStreamArray)) {
                 $rDelete[] = $row["id"];
             }
@@ -78,7 +73,6 @@ if (isset($_POST["replace_dns"])) {
     $result = $db->query("SELECT `activity_id`, `stream_id` FROM `user_activity`;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
-            $row = XSSRow($row);
             if (!in_array(intval($row["stream_id"]), $rStreamArray)) {
                 $rDelete[] = $row["activity_id"];
             }

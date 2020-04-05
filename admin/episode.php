@@ -170,7 +170,6 @@ if (isset($_POST["submit_stream"])) {
                 $result = $db->query("SELECT `server_stream_id`, `server_id` FROM `streams_sys` WHERE `stream_id` = ".intval($rInsertID).";");
                 if (($result) && ($result->num_rows > 0)) {
                     while ($row = $result->fetch_assoc()) {
-                        $row = XSSRow($row);
                         $rStreamExists[intval($row["server_id"])] = intval($row["server_stream_id"]);
                     }
                 }
@@ -237,7 +236,7 @@ if (isset($_GET["id"])) {
     }
     $result = $db->query("SELECT `season_num`, `sort` FROM `series_episodes` WHERE `stream_id` = ".intval($rEpisode["id"]).";");
     if (($result) && ($result->num_rows == 1)) {
-        $row = XSSRow($result->fetch_assoc());
+        $row = $result->fetch_assoc();
         $rEpisode["episode"] = intval($row["sort"]);
         $rEpisode["season"] = intval($row["season_num"]);
     } else {

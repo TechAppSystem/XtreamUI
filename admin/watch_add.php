@@ -52,7 +52,7 @@ if (isset($_POST["submit_folder"])) {
             } else {
                 $rArray["auto_subtitles"] = 0;
             }
-            $rCols = ESC(implode(',', array_keys($rArray)));
+            $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
             foreach (array_values($rArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
                 if (is_array($rValue)) {

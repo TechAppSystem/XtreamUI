@@ -84,7 +84,7 @@ if (isset($_POST["submit_radio"])) {
 				$rImportArray[$rKey] = $rImportStream[$rKey];
             }
             $rImportArray["order"] = getNextOrder();
-            $rCols = ESC("`".implode('`,`', array_keys($rImportArray))."`");
+            $rCols = "`".ESC(implode('`,`', array_keys($rImportArray)))."`";
             $rValues = null;
             foreach (array_values($rImportArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';

@@ -46,7 +46,7 @@ if (isset($_POST["submit_user"])) {
         if (isset($_POST["notes"])) {
             $rArray["notes"] = $_POST["notes"];
         }
-        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {

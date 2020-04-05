@@ -91,6 +91,7 @@ if ($rSettings["sidebar"]) {
                                             <th>Username</th>
                                             <th>Stream</th>
                                             <th>Server</th>
+                                            <th>ISP</th>
                                             <th class="text-center">Start</th>
                                             <th class="text-center">Stop</th>
                                             <th class="text-center">IP</th>
@@ -303,7 +304,7 @@ if ($rSettings["sidebar"]) {
                     }
                 },
                 columnDefs: [
-                    {"className": "dt-center", "targets": [0,4,5,6,7]}
+                    {"className": "dt-center", "targets": [0,5,6,7,8]}
                 ],
                 "order": [[ 0, "desc" ]],
                 pageLength: <?=$rAdminSettings["default_entries"] ?: 10?>,
@@ -330,9 +331,17 @@ if ($rSettings["sidebar"]) {
             <?php }
             if (!$rAdminSettings["auto_refresh"]) { ?>
             toggleAuto();
+            <?php }
+            if (isset($_GET["search"])) { ?>
+            $("#act_search").val("<?=str_replace('"', '\"', $_GET["search"])?>").trigger('change');
+            <?php } if (isset($_GET["dates"])) { ?>
+            $("#act_range").val("<?=str_replace('"', '\"', $_GET["dates"])?>").trigger('change');
             <?php } ?>
             if ($('#act_search').val().length > 0) {
                 $('#datatable-activity').DataTable().search($('#act_search').val()).draw();
+            }
+            if ($('#act_range').val().length > 0) {
+                $("#datatable-activity").DataTable().ajax.reload( null, false );
             }
         });
         

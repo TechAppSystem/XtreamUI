@@ -22,7 +22,7 @@ if (isset($_POST["submit_server"])) {
 			$rArray["rtmp_port"] = intval($_POST["rtmp_port"]);
 			unset($_POST["rtmp_port"]);
 		}
-        $rCols = ESC(implode(',', array_keys($rArray)));
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {

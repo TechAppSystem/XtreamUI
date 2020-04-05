@@ -72,12 +72,7 @@ if (isset($_POST["submit_user"])) {
             $rArray[$rSelection] = 0;
         }
     }
-    $rArray["bouquet"] = array_values(json_decode($_POST["bouquets_selected"], True));
-    $rBouquetOrder = getBouquetOrder();
-    $rOrderKeys = array_flip($rOrder);
-    usort($rArray["bouquet"], function ($u1, $u2)  use ($rOrderKeys) {
-        return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
-    });
+    $rArray["bouquet"] = sortArrayByArray(array_values(json_decode($_POST["bouquets_selected"], True)), array_keys(getBouquetOrder()));
     $rArray["bouquet"] = "[".join(",", $rArray["bouquet"])."]";
     unset($_POST["bouquets_selected"]);
     if ((isset($_POST["exp_date"])) && (!isset($_POST["no_expire"]))) {
@@ -120,7 +115,7 @@ if (isset($_POST["submit_user"])) {
             $rArray["member_id"] = -1;
         }
         $rArray["created_by"] = $rArray["member_id"];
-        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -473,7 +468,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ips">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select id="allowed_ips" name="allowed_ips[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select id="allowed_ips" name="allowed_ips[]" size=6 class="form-control" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ips"], True) as $rIP) { ?>
                                                                 <option value="<?=$rIP?>"><?=$rIP?></option>
                                                                 <?php } } ?>
@@ -493,7 +488,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ua">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select id="allowed_ua" name="allowed_ua[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select id="allowed_ua" name="allowed_ua[]" size=6 class="form-control" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ua"], True) as $rUA) { ?>
                                                                 <option value="<?=$rUA?>"><?=$rUA?></option>
                                                                 <?php } } ?>

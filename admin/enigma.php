@@ -20,7 +20,7 @@ if (isset($_POST["submit_e2"])) {
             $rArray["pair_id"] = $rArray["id"];
             unset($rArray["id"]);
             // Create new user.
-            $rCols = ESC(implode(',', array_keys($rArray)));
+            $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
             foreach (array_values($rArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
                 if (is_array($rValue)) {

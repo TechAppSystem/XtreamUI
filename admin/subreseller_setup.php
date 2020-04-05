@@ -13,7 +13,7 @@ if (isset($_POST["submit_subreseller"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = ESC(implode(',', array_keys($rArray)));
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {

@@ -11,12 +11,15 @@ if (isset($_POST["submit_bouquet"])) {
     } else if (isset($_POST["edit"])) {
         echo $_["bouquet_data_not_transfered"]; exit;
     }
+    if (!isset($_POST["edit"])) {
+        $rArray["bouquet_order"] = intval($db->query("SELECT MAX(`bouquet_order`) AS `max` FROM `bouquets`;")->fetch_assoc()["max"]) + 1;
+    }
     foreach($_POST as $rKey => $rValue) {
         if (isset($rArray[$rKey])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = ESC(implode(',', array_keys($rArray)));
+    $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {

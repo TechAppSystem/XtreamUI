@@ -8,7 +8,6 @@ if (isset($_POST["bouquet_order_array"])) {
     ini_set('max_execution_time', 0);
     ini_set('default_socket_timeout', 0);
     $rOrder = json_decode($_POST["bouquet_order_array"], True);
-    $rOrderKeys = array_flip($rOrder);
     $rSort = 1;
     foreach ($rOrder as $rBouquetID) {
         $db->query("UPDATE `bouquets` SET `bouquet_order` = ".intval($rSort)." WHERE `id` = ".intval($rBouquetID).";");
@@ -18,17 +17,13 @@ if (isset($_POST["bouquet_order_array"])) {
         $rUsers = getUserBouquets();
         foreach ($rUsers as $rUser) {
             $rBouquet = json_decode($rUser["bouquet"], True);
-            usort($rBouquet, function ($u1, $u2)  use ($rOrderKeys) {
-                return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
-            });
+            $rBouquet = sortArrayByArray($rBouquet, $rOrder);
             $db->query("UPDATE `users` SET `bouquet` = '[".ESC(join(",", $rBouquet))."]' WHERE `id` = ".intval($rUser["id"]).";");
         }
         $rPackages = getPackages();
         foreach ($rPackages as $rPackage) {
             $rBouquet = json_decode($rPackage["bouquets"], True);
-            usort($rBouquet, function ($u1, $u2)  use ($rOrderKeys) {
-                return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
-            });
+            $rBouquet = sortArrayByArray($rBouquet, $rOrder);
             $db->query("UPDATE `packages` SET `bouquets` = '[".ESC(join(",", $rBouquet))."]' WHERE `id` = ".intval($rPackage["id"]).";");
         }
         $_STATUS = 0;

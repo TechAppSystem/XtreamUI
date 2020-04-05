@@ -16,7 +16,7 @@ if (isset($_GET["geolite2"])) {
 
 if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
     $rArray = getSettings();
-    foreach (Array("disallow_empty_user_agents", "persistent_connections", "show_all_category_mag", "show_not_on_air_video", "show_banned_video", "show_expired_video", "new_sorting_bouquet", "rtmp_random", "use_buffer", "audio_restart_loss", "save_closed_connection", "client_logs_save", "case_sensitive_line", "county_override_1st", "disallow_2nd_ip_con", "firewall", "use_mdomain_in_lists", "mag_security", "always_enabled_subtitles", "enable_connection_problem_indication", "show_tv_channel_logo", "show_channel_logo_in_preview", "stb_change_pass", "enable_debug_stalker") as $rSetting) {
+    foreach (Array("disallow_empty_user_agents", "persistent_connections", "show_all_category_mag", "show_not_on_air_video", "show_banned_video", "show_expired_video", "new_sorting_bouquet", "rtmp_random", "use_buffer", "audio_restart_loss", "save_closed_connection", "client_logs_save", "case_sensitive_line", "county_override_1st", "disallow_2nd_ip_con", "firewall", "use_mdomain_in_lists", "hash_lb", "mag_security", "always_enabled_subtitles", "enable_connection_problem_indication", "show_tv_channel_logo", "show_channel_logo_in_preview", "stb_change_pass", "enable_debug_stalker") as $rSetting) {
         if (isset($_POST[$rSetting])) {
             $rArray[$rSetting] = 1;
             unset($_POST[$rSetting]);
@@ -713,6 +713,16 @@ if ($rSettings["sidebar"]) {
                                                             <label class="col-md-4 col-form-label" for="use_mdomain_in_lists">Use Domain in Lists <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Use domain name in lists." class="mdi mdi-information"></i></label>
                                                             <div class="col-md-2">
                                                                 <input name="use_mdomain_in_lists" id="use_mdomain_in_lists" type="checkbox"<?php if ($rSettings["use_mdomain_in_lists"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                            <label class="col-md-4 col-form-label" for="hash_lb">Hash Load Balancers <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Any client is being redirected to your Load Balancers securely using Hash & crypt functions. However, this type of security can impact some clients that uses different IPs on every request or if your main is hidden behind a DNS such as Cloudflare. If you are streaming inside a type of network like this, you will need to disable this setting." class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input name="hash_lb" id="hash_lb" type="checkbox"<?php if ($rSettings["hash_lb"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mb-4">
+                                                            <label class="col-md-4 col-form-label" for="show_isps">Enable ISP's <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Grab ISP information for each client that connections. This requires modifications to your hosts file, please see forum for more information." class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input name="show_isps" id="show_isps" type="checkbox"<?php if ($rSettings["show_isps"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">

@@ -138,7 +138,7 @@ if (isset($_POST["submit_stream"])) {
         if (isset($rImportArray["target_container"])) {
             $rArray["target_container"] = $rImportArray["target_container"];
         }
-        $rCols = ESC(implode(',', array_keys($rArray)));
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         $rValues = null;
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';

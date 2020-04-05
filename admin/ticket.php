@@ -9,7 +9,7 @@ if (isset($_POST["submit_ticket"])) {
     if (!isset($_STATUS)) {
         if (!isset($_POST["respond"])) {
             $rArray = Array("member_id" => $rUserInfo["id"], "title" => $_POST["title"], "status" => 1, "admin_read" => 0, "user_read" => 1);
-            $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
+            $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
             foreach (array_values($rArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
                 if (is_array($rValue)) {

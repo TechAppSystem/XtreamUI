@@ -30,12 +30,7 @@ if (isset($_POST["submit_package"])) {
         $rArray["groups"] = "[".join(",", $rArray["groups"])."]";
         unset($_POST["groups"]);
     }
-    $rArray["bouquets"] = array_values(json_decode($_POST["bouquets_selected"], True));
-    $rBouquetOrder = getBouquetOrder();
-    $rOrderKeys = array_flip($rOrder);
-    usort($rArray["bouquets"], function ($u1, $u2)  use ($rOrderKeys) {
-        return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
-    });
+    $rArray["bouquets"] = sortArrayByArray(array_values(json_decode($_POST["bouquets_selected"], True)), array_keys(getBouquetOrder()));
     $rArray["bouquets"] = "[".join(",", $rArray["bouquets"])."]";
     unset($_POST["bouquets_selected"]);
     if (isset($_POST["output_formats"])) {
@@ -52,7 +47,7 @@ if (isset($_POST["submit_package"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {

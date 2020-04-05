@@ -185,7 +185,7 @@ if (isset($_POST["submit_movie"])) {
             $rImportArray["order"] = getNextOrder();
             $rSync = $rImportArray["async"];
             unset($rImportArray["async"]);
-            $rCols = ESC(implode(',', array_keys($rImportArray)));
+            $rCols = "`".ESC(implode('`,`', array_keys($rImportArray)))."`";
             $rValues = null;
             foreach (array_values($rImportArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';

@@ -206,7 +206,7 @@ if (isset($_POST["submit_stream"])) {
 				$rImportArray[$rKey] = $rImportStream[$rKey];
             }
             $rImportArray["order"] = getNextOrder();
-            $rCols = ESC("`".implode('`,`', array_keys($rImportArray))."`");
+            $rCols = "`".ESC(implode('`,`', array_keys($rImportArray)))."`";
             $rValues = null;
             foreach (array_values($rImportArray) as $rValue) {
                 isset($rValues) ? $rValues .= ',' : $rValues = '';
@@ -451,6 +451,7 @@ if ($rSettings["sidebar"]) {
                                 <table id="datatable" class="table table-borderless mb-0">
                                     <thead class="bg-light">
                                         <tr>
+                                            <th></th>
                                             <th></th>
                                             <th></th>
                                             <th>Source</th>
@@ -1234,8 +1235,8 @@ if ($rSettings["sidebar"]) {
                     }
                 },
                 columnDefs: [
-                    {"className": "dt-center", "targets": [2,3,4,5]},
-                    {"visible": false, "targets": [0,1,6]}
+                    {"className": "dt-center", "targets": [3,4,5,6]},
+                    {"visible": false, "targets": [0,1,2,7]}
                 ],
             });
             setTimeout(reloadStream, 5000);

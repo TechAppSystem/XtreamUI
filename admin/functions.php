@@ -1,19 +1,20 @@
 <?php
+include_once("/home/xtreamcodes/iptv_xtream_codes/admin/HTMLPurifier.standalone.php");
+
 $rRelease = 22;             // Official Beta Release Number
-$rEarlyAccess = "C";	   	// Early Access Release
+$rEarlyAccess = "D";	   	// Early Access Release
 $rTimeout = 60;             // Seconds Timeout for Queries, Functions & Requests
 $rDebug = False;
-
-function isJson($rString) {
-    json_decode($rString);
-    return (json_last_error() == JSON_ERROR_NONE);
-}
+$rPurifier = new HTMLPurifier(HTMLPurifier_Config::createDefault());
 
 function XSS($rString) {
-    if (isJson(html_entity_decode($rString))) {
-        return json_encode(json_decode(html_entity_decode($rString), True));
+    global $rPurifier;
+    if ((is_null($rString)) OR (strtoupper($rString) == 'NULL')) {
+        return null;
+    } else if (is_array($rString)) {
+        return XSSRow($rString);
     } else {
-        return htmlspecialchars($rString, ENT_QUOTES, 'UTF-8');
+        return str_replace("&quot;", '"', str_replace("&amp;", "&", $rPurifier->purify($rString)));
     }
 }
 
@@ -27,6 +28,17 @@ function XSSRow($rRow) {
 function ESC($rString) {
     global $db;
     return $db->real_escape_string($rString);
+}
+
+function sortArrayByArray(array $rArray, array $rSort) {
+    $rOrdered = Array();
+    foreach ($rSort as $rValue) {
+        if (($rKey = array_search($rValue, $rArray)) !== false) {
+            $rOrdered[] = $rValue;
+            unset($rArray[$rKey]);
+        }
+    }
+    return $rOrdered + $rArray;
 }
 
 function updateGeoLite2() {
@@ -338,7 +350,7 @@ function listDir($rServerID, $rDirectory, $rAllowed=null) {
     global $rServers, $_INFO, $rSettings;
     set_time_limit(60);
     ini_set('max_execution_time', 60);
-	$rReturn = Array("dirs" => Array(), "files" => Array());
+    $rReturn = Array("dirs" => Array(), "files" => Array());
     if ($rServerID == $_INFO["server_id"]) {
         $rFiles = scanDir($rDirectory);
         foreach ($rFiles as $rKey => $rValue) {
@@ -354,17 +366,29 @@ function listDir($rServerID, $rDirectory, $rAllowed=null) {
             }
         }
     } else {
-        $rData = SystemAPIRequest($rServerID, Array('action' => 'viewDir', 'dir' => $rDirectory));
-        $rDocument = new DOMDocument();
-        $rDocument->loadHTML($rData);
-        $rFiles = $rDocument->getElementsByTagName('li');
-        foreach($rFiles as $rFile) {
-            if (stripos($rFile->getAttribute('class'), "directory") !== false) {
-                $rReturn["dirs"][] = $rFile->nodeValue;
-            } else if (stripos($rFile->getAttribute('class'), "file") !== false) {
-                $rExt = strtolower(pathinfo($rFile->nodeValue)["extension"]);
-                if (((is_array($rAllowed)) && (in_array($rExt, $rAllowed))) OR (!$rAllowed)) {
-                    $rReturn["files"][] = $rFile->nodeValue;
+        $rFilename = tempnam(MAIN_DIR.'tmp/', 'ls_');
+        $rCommand = "ls -cm -f --group-directories-first --indicator-style=slash \"".$rDirectory."\" >> ".$rFilename;
+        sexec($rServerID, $rCommand);
+        $rData = ""; $rI = 2;
+        while (strlen($rData) == 0) {
+            $rData = SystemAPIRequest($rServerID, Array('action' => 'getFile', 'filename' => $rFilename));
+            $rI --;
+            if (($rI == 0) OR (strlen($rData) > 0)) { break; }
+            sleep(1);
+        }
+        if (strlen($rData) > 0) {
+            $rFiles = explode(",", $rData);
+            foreach($rFiles as $rFile) {
+                $rFile = trim($rFile);
+                if (substr($rFile, -1) == "/") {
+                    if ((substr($rFile, 0, -1) <> "..") && (substr($rFile, 0, -1) <> ".")) {
+                        $rReturn["dirs"][] = substr($rFile, 0, -1);
+                    }
+                } else {
+                    $rExt = strtolower(pathinfo($rFile)["extension"]);
+                    if (((is_array($rAllowed)) && (in_array($rExt, $rAllowed))) OR (!$rAllowed)) {
+                        $rReturn["files"][] = $rFile;
+                    }
                 }
             }
         }
@@ -1669,10 +1693,11 @@ function updateTMDbCategories() {
 
 function forceSecurity() {
     global $db;
-    $db->query("UPDATE `settings` SET `hash_lb` = 1, `double_auth` = 1, `mag_security` = 1;");
+    $db->query("UPDATE `settings` SET `double_auth` = 1, `mag_security` = 1;");
     $db->query("UPDATE `mag_devices` SET `lock_device` = 1;");
     $db->query("UPDATE `admin_settings` SET `pass_length` = 8 WHERE `pass_length` < 8;");
     $db->query("ALTER TABLE `mag_devices` CHANGE COLUMN `lock_device` `lock_device` TINYINT(4) NOT NULL DEFAULT '1';");
+    $db->query("UPDATE `settings` SET `allow_countries` = '[\"A1\",\"A2\",\"O1\",\"AF\",\"AX\",\"AL\",\"DZ\",\"AS\",\"AD\",\"AO\",\"AI\",\"AQ\",\"AG\",\"AR\",\"AM\",\"AW\",\"AU\",\"AT\",\"AZ\",\"BS\",\"BH\",\"BD\",\"BB\",\"BY\",\"BE\",\"BZ\",\"BJ\",\"BM\",\"BT\",\"BO\",\"BA\",\"BW\",\"BV\",\"BR\",\"IO\",\"BN\",\"BG\",\"BF\",\"BI\",\"KH\",\"CM\",\"CA\",\"CV\",\"KY\",\"CF\",\"TD\",\"CL\",\"CN\",\"CX\",\"CC\",\"CO\",\"KM\",\"CG\",\"CD\",\"CK\",\"CR\",\"CI\",\"HR\",\"CU\",\"CW\",\"CY\",\"CZ\",\"DK\",\"DJ\",\"DM\",\"DO\",\"EC\",\"EG\",\"SV\",\"GQ\",\"ER\",\"EE\",\"ET\",\"EU\",\"FK\",\"FO\",\"FJ\",\"FI\",\"FR\",\"GF\",\"PF\",\"TF\",\"MK\",\"GA\",\"GM\",\"GE\",\"DE\",\"GH\",\"GI\",\"GR\",\"GL\",\"GD\",\"GP\",\"GU\",\"GT\",\"GG\",\"GN\",\"GW\",\"GY\",\"HT\",\"HM\",\"VA\",\"HN\",\"HK\",\"HU\",\"IS\",\"IN\",\"ID\",\"IR\",\"IQ\",\"IE\",\"IM\",\"IL\",\"IT\",\"JM\",\"JP\",\"JE\",\"JO\",\"KZ\",\"KE\",\"KI\",\"KR\",\"KV\",\"KW\",\"KG\",\"LA\",\"LV\",\"LB\",\"LS\",\"LR\",\"LY\",\"LI\",\"LT\",\"LU\",\"MO\",\"MG\",\"MW\",\"MY\",\"MV\",\"ML\",\"MT\",\"MH\",\"MQ\",\"MR\",\"MU\",\"YT\",\"MX\",\"FM\",\"MD\",\"MC\",\"MN\",\"ME\",\"MS\",\"MA\",\"MZ\",\"MM\",\"NA\",\"NR\",\"NP\",\"NL\",\"AN\",\"NC\",\"NZ\",\"NI\",\"NE\",\"NG\",\"NU\",\"NF\",\"MP\",\"NO\",\"OM\",\"PK\",\"PW\",\"PS\",\"PA\",\"PG\",\"PY\",\"PE\",\"PH\",\"PN\",\"PL\",\"PT\",\"PR\",\"QA\",\"RE\",\"RO\",\"RU\",\"RW\",\"BL\",\"SH\",\"KN\",\"LC\",\"MF\",\"PM\",\"VC\",\"WS\",\"SM\",\"ST\",\"SA\",\"SN\",\"RS\",\"SC\",\"SL\",\"SG\",\"SK\",\"SI\",\"SB\",\"SO\",\"ZA\",\"GS\",\"ES\",\"LK\",\"SD\",\"SR\",\"SJ\",\"SZ\",\"SE\",\"SX\",\"CH\",\"SY\",\"TW\",\"TJ\",\"TZ\",\"TH\",\"TL\",\"TG\",\"TK\",\"TO\",\"TT\",\"TN\",\"TR\",\"TM\",\"TC\",\"TV\",\"UG\",\"UA\",\"AE\",\"GB\",\"US\",\"UM\",\"UY\",\"UZ\",\"VU\",\"VE\",\"VN\",\"VG\",\"VI\",\"WF\",\"EH\",\"YE\",\"ZM\",\"ZW\"]';");
 }
 
 if (file_exists("/home/xtreamcodes/iptv_xtream_codes/admin/.update")) {
@@ -1711,4 +1736,6 @@ if (isset($_SESSION['hash'])) {
         }
     }
 }
+
+$_GET = XSSRow($_GET); $_POST = XSSRow($_POST); // Parse user input.
 ?>

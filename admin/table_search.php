@@ -34,7 +34,7 @@ if ($rType == "users") {
 		}
 	}
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR `users`.`password` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`max_connections` LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -200,7 +200,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR from_base64(`mag_devices`.`mac`) LIKE '%".strtoupper($rSearch)."%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -352,7 +352,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR `enigma2_devices`.`mac` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`exp_date`) LIKE '%{$rSearch}%' OR `users`.`reseller_notes` LIKE '%{$rSearch}%' OR `users`.`admin_notes` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -503,7 +503,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = ESC($_GET["search"]["value"]);
+            $rSearch = $_GET["search"]["value"];
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -757,7 +757,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = ESC($_GET["search"]["value"]);
+            $rSearch = $_GET["search"]["value"];
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -965,7 +965,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = ESC($_GET["search"]["value"]);
+            $rSearch = $_GET["search"]["value"];
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -1136,7 +1136,7 @@ if ($rType == "users") {
         $rWhere[] = "`series_episodes`.`series_id` = ".intval($_GET["series"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -1210,7 +1210,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`user_activity`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity`.`user_ip` LIKE '%{$rSearch}%' OR `user_activity`.`container` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity`.`date_start`) LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity`.`date_end`) LIKE '%{$rSearch}%' OR `user_activity`.`geoip_country_code` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1246,7 +1246,7 @@ if ($rType == "users") {
     }
     $rReturn["recordsFiltered"] = $rReturn["recordsTotal"];
     if ($rReturn["recordsTotal"] > 0) {
-        $rQuery = "SELECT `user_activity`.`activity_id`, `user_activity`.`user_id`, `user_activity`.`stream_id`, `user_activity`.`server_id`, `user_activity`.`user_agent`, `user_activity`.`user_ip`, `user_activity`.`container`, `user_activity`.`date_start`, `user_activity`.`date_end`, `user_activity`.`geoip_country_code`, `users`.`username`, `streams`.`stream_display_name`, `streams`.`type`, `streaming_servers`.`server_name` FROM `user_activity` INNER JOIN `users` ON `user_activity`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity`.`server_id` = `streaming_servers`.`id` {$rWhereString} {$rOrderBy} LIMIT {$rStart}, {$rLimit};";
+        $rQuery = "SELECT `user_activity`.`activity_id`, `user_activity`.`isp`, `user_activity`.`user_id`, `user_activity`.`stream_id`, `user_activity`.`server_id`, `user_activity`.`user_agent`, `user_activity`.`user_ip`, `user_activity`.`container`, `user_activity`.`date_start`, `user_activity`.`date_end`, `user_activity`.`geoip_country_code`, `users`.`username`, `streams`.`stream_display_name`, `streams`.`type`, `streaming_servers`.`server_name` FROM `user_activity` INNER JOIN `users` ON `user_activity`.`user_id` = `users`.`id` LEFT JOIN `streams` ON `user_activity`.`stream_id` = `streams`.`id` LEFT JOIN `streaming_servers` ON `user_activity`.`server_id` = `streaming_servers`.`id` {$rWhereString} {$rOrderBy} LIMIT {$rStart}, {$rLimit};";
         $rResult = $db->query($rQuery);
         if (($rResult) && ($rResult->num_rows > 0)) {
             while ($rRow = $rResult->fetch_assoc()) {
@@ -1288,7 +1288,7 @@ if ($rType == "users") {
                 } else {
                     $rStop = "";
                 }
-                $rReturn["data"][] = Array($rRow["activity_id"], $rUsername, $rChannel, $rServer, $rStart, $rStop, $rIP, $rGeoCountry);
+                $rReturn["data"][] = Array($rRow["activity_id"], $rUsername, $rChannel, $rServer, $rRow["isp"], $rStart, $rStop, $rIP, $rGeoCountry);
             }
         }
     }
@@ -1308,7 +1308,7 @@ if ($rType == "users") {
         $rWhere[] = "`users`.`member_id` IN (".join(",", array_keys(getRegisteredUsers($rUserInfo["id"]))).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`user_activity_now`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity_now`.`user_agent` LIKE '%{$rSearch}%' OR `user_activity_now`.`user_ip` LIKE '%{$rSearch}%' OR `user_activity_now`.`container` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`user_activity_now`.`date_start`) LIKE '%{$rSearch}%' OR `user_activity_now`.`geoip_country_code` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["server_id"]) > 0) {
@@ -1426,7 +1426,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1471,7 +1471,7 @@ if ($rType == "users") {
         $rWhere[] = "`streams`.`category_id` = ".intval($_GET["category"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -1562,7 +1562,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1610,7 +1610,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`series`.`id` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1651,7 +1651,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`target`.`username` LIKE '%{$rSearch}%' OR `owner`.`username` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `credits_log`.`amount` LIKE '%{$rSearch}%' OR `credits_log`.`reason` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1704,6 +1704,46 @@ if ($rType == "users") {
         }
     }
     echo json_encode($rReturn);exit;
+} else if ($rType == "user_ips") {
+	if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "connection_logs"))) { exit; }
+    $rReturn = Array("draw" => $_GET["draw"], "recordsTotal" => 0, "recordsFiltered" => 0, "data" => Array());
+    $rOrder = Array(false);
+    if (strlen($_GET["order"][0]["column"]) > 0) {
+        $rOrderRow = intval($_GET["order"][0]["column"]);
+    } else {
+        $rOrderRow = 0;
+    }
+    $rWhere = Array("`date_start` >= (UNIX_TIMESTAMP()-".intval($_GET["range"]).")");
+    if (strlen($_GET["search"]["value"]) > 0) {
+        $rSearch = $_GET["search"]["value"];
+        $rWhere[] = "(`users`.`username` LIKE '%{$rSearch}%' OR `user_activity`.`user_id` LIKE '%{$rSearch}%' OR `user_activity`.`user_ip` LIKE '%{$rSearch}%')";
+    }
+    $rWhereString = "WHERE ".join(" AND ", $rWhere);
+    if ($rOrder[$rOrderRow]) {
+        $rOrderBy = "ORDER BY ".$rOrder[$rOrderRow]." ".$_GET["order"][0]["dir"];
+    }
+    $rCountQuery = "SELECT COUNT(DISTINCT(`user_activity`.`user_id`)) AS `count` FROM `user_activity` LEFT JOIN `users` ON `users`.`id` = `user_activity`.`user_id` {$rWhereString};";
+    $rResult = $db->query($rCountQuery);
+    if (($rResult) && ($rResult->num_rows == 1)) {
+        $rReturn["recordsTotal"] = $rResult->fetch_assoc()["count"];
+    } else {
+        $rReturn["recordsTotal"] = 0;
+    }
+    $rReturn["recordsFiltered"] = $rReturn["recordsTotal"];
+    if ($rReturn["recordsTotal"] > 0) {
+        $rQuery = "SELECT `user_activity`.`user_id`, COUNT(DISTINCT(`user_activity`.`user_ip`)) AS `ip_count`, `users`.`username` FROM `user_activity` LEFT JOIN `users` ON `users`.`id` = `user_activity`.`user_id` {$rWhereString} GROUP BY `user_activity`.`user_id` {$rOrderBy} LIMIT {$rStart}, {$rLimit};";
+        $rResult = $db->query($rQuery);
+        if (($rResult) && ($rResult->num_rows > 0)) {
+            while ($rRow = $rResult->fetch_assoc()) {
+                $rRow = XSSRow($rRow);
+                $rDates = date("Y-m-d", time()-intval($_GET["range"]))." - ".date("Y-m-d", time());
+                $rButtons = '<a href="./user_activity.php?search='.$rRow["username"].'&dates='.$rDates.'"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs">View Logs</button></a>
+                ';
+                $rReturn["data"][] = Array("<a href='./user.php?id=".$rRow["user_id"]."'>".$rRow["user_id"]."</a>", $rRow["username"], $rRow["ip_count"], $rButtons);
+            }
+        }
+    }
+    echo json_encode($rReturn);exit;
 } else if ($rType == "client_logs") {
 	if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "client_request_log"))) { exit; }
     $rReturn = Array("draw" => $_GET["draw"], "recordsTotal" => 0, "recordsFiltered" => 0, "data" => Array());
@@ -1715,7 +1755,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`client_logs`.`client_status` LIKE '%{$rSearch}%' OR `client_logs`.`query_string` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `client_logs`.`user_agent` LIKE '%{$rSearch}%' OR `client_logs`.`ip` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `users`.`username` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1732,7 +1772,7 @@ if ($rType == "users") {
         }
     }
     if (strlen($_GET["filter"]) > 0) {
-        $rWhere[] = "`client_logs`.`client_status` = '".ESC($_GET["filter"])."'";
+        $rWhere[] = "`client_logs`.`client_status` = '".$_GET["filter"]."'";
     }
     if (count($rWhere) > 0) {
         $rWhereString = "WHERE ".join(" AND ", $rWhere);
@@ -1777,7 +1817,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`reg_userlog`.`username` LIKE '%{$rSearch}%' OR `reg_userlog`.`type` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1839,7 +1879,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%' OR FROM_UNIXTIME(`date`) LIKE '%{$rSearch}%' OR `stream_logs`.`error` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["range"]) > 0) {
@@ -1901,7 +1941,7 @@ if ($rType == "users") {
         $rWhere[] = "`streams`.`category_id` = ".intval($_GET["category"]);
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%')";
     }
     if ($rOrder[$rOrderRow]) {
@@ -1947,7 +1987,7 @@ if ($rType == "users") {
         $rWhere[] = "`reg_users`.`owner_id` IN (".join(",", $rAvailableMembers).")";
     }
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`reg_users`.`id` LIKE '%{$rSearch}%' OR `reg_users`.`username` LIKE '%{$rSearch}%' OR `reg_users`.`notes` LIKE '%{$rSearch}%' OR `r`.`username` LIKE '%{$rSearch}%' OR from_unixtime(`reg_users`.`date_registered`) LIKE '%{$rSearch}%' OR from_unixtime(`reg_users`.`last_login`) LIKE '%{$rSearch}%' OR `reg_users`.`email` LIKE '%{$rSearch}%' OR `reg_users`.`ip` LIKE '%{$rSearch}%' OR `member_groups`.`group_name` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["filter"]) > 0) {
@@ -2041,7 +2081,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`series`.`id` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `series`.`releaseDate` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["category"]) > 0) {
@@ -2121,7 +2161,7 @@ if ($rType == "users") {
         $rOrderBy = "ORDER BY `streams_sys`.`server_stream_id` ASC";
     } else {
         if (strlen($_GET["search"]["value"]) > 0) {
-            $rSearch = ESC($_GET["search"]["value"]);
+            $rSearch = $_GET["search"]["value"];
             $rWhere[] = "(`streams`.`id` LIKE '%{$rSearch}%' OR `streams`.`stream_display_name` LIKE '%{$rSearch}%' OR `series`.`title` LIKE '%{$rSearch}%' OR `streams`.`notes` LIKE '%{$rSearch}%' OR `streams_sys`.`current_source` LIKE '%{$rSearch}%' OR `stream_categories`.`category_name` LIKE '%{$rSearch}%' OR `streaming_servers`.`server_name` LIKE '%{$rSearch}%')";
         }
         if (strlen($_GET["filter"]) > 0) {
@@ -2300,7 +2340,7 @@ if ($rType == "users") {
     }
     $rWhere = Array();
     if (strlen($_GET["search"]["value"]) > 0) {
-        $rSearch = ESC($_GET["search"]["value"]);
+        $rSearch = $_GET["search"]["value"];
         $rWhere[] = "(`watch_output`.`id` LIKE '%{$rSearch}%' OR `watch_output`.`filename` LIKE '%{$rSearch}%' OR `watch_output`.`dateadded` LIKE '%{$rSearch}%')";
     }
     if (strlen($_GET["server"]) > 0) {

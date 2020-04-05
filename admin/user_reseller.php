@@ -174,7 +174,7 @@ if (isset($_POST["submit_user"])) {
     }
     if (!isset($_STATUS)) {
         $rArray["created_by"] = $rUserInfo["id"];
-        $rCols = ESC("`".implode('`,`', array_keys($rArray))."`");
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {    
@@ -525,7 +525,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ips">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select class="form-control" id="allowed_ips" name="allowed_ips[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select class="form-control" id="allowed_ips" name="allowed_ips[]" size=6 class="form-control" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ips"], True) as $rIP) { ?>
                                                                 <option value="<?=$rIP?>"><?=$rIP?></option>
                                                                 <?php } } ?>
@@ -545,7 +545,7 @@ if ($rSettings["sidebar"]) {
                                                         <div class="form-group row mb-4">
                                                             <label class="col-md-4 col-form-label" for="allowed_ua">&nbsp;</label>
                                                             <div class="col-md-8">
-                                                                <select class="form-control" id="allowed_ua" name="allowed_ua[]" size=6 class="form-control select2" data-toggle="select2" multiple="multiple">
+                                                                <select class="form-control" id="allowed_ua" name="allowed_ua[]" size=6 class="form-control" multiple="multiple">
                                                                 <?php if (isset($rUser)) { foreach(json_decode($rUser["allowed_ua"], True) as $rUA) { ?>
                                                                 <option value="<?=$rUA?>"><?=$rUA?></option>
                                                                 <?php } } ?>

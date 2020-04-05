@@ -4,7 +4,7 @@ if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "add_rtmp"))) { exit
 
 if (isset($_POST["submit_ip"])) {
     $rArray = Array("ip" => $_POST["ip"], "notes" => $_POST["notes"]);
-    $rCols = ESC(implode(',', array_keys($rArray)));
+    $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';
         if (is_array($rValue)) {

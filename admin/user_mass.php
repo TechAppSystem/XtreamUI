@@ -48,12 +48,8 @@ if (isset($_POST["submit_user"])) {
 			if (is_numeric($rBouquet)) {
 				$rArray["bouquet"][] = intval($rBouquet);
 			}
-		}
-        $rBouquetOrder = getBouquetOrder();
-        $rOrderKeys = array_flip($rOrder);
-        usort($rArray["bouquet"], function ($u1, $u2)  use ($rOrderKeys) {
-            return $rOrderKeys[intval($u1)] >= $rOrderKeys[intval($u2)] ?  1 : -1;
-        });
+		}       
+        $rArray["bouquet"] = sortArrayByArray($rArray["bouquet"], array_keys(getBouquetOrder()));
         $rArray["bouquet"] = "[".join(",", $rArray["bouquet"])."]";
     }
     $rUsers = json_decode($_POST["users_selected"], True);

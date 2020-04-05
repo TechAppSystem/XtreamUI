@@ -31,7 +31,7 @@ if (isset($_POST["submit_series"])) {
             $rArray[$rKey] = $rValue;
         }
     }
-    $rCols = ESC(implode(',', array_keys($rArray)));
+    $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
     $rValues = null;
     foreach (array_values($rArray) as $rValue) {
         isset($rValues) ? $rValues .= ',' : $rValues = '';

@@ -58,12 +58,6 @@ if (isset($_POST["submit_server"])) {
     } else {
         $rArray["enable_geoip"] = false;
     }
-    if (isset($_POST["geoip_type"])) {
-        $rArray["geoip_type"] = "high_priority";
-        unset($_POST["geoip_type"]);
-    } else {
-        $rArray["geoip_type"] = "low_priority";
-    }
     if (isset($_POST["geoip_countries"])) {
         $rArray["geoip_countries"] = Array();
         foreach ($_POST["geoip_countries"] as $rCountry) {
@@ -79,7 +73,7 @@ if (isset($_POST["submit_server"])) {
                 $rArray[$rKey] = $rValue;
             }
         }
-        $rCols = ESC(implode(',', array_keys($rArray)));
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
         foreach (array_values($rArray) as $rValue) {
             isset($rValues) ? $rValues .= ',' : $rValues = '';
             if (is_array($rValue)) {
@@ -284,9 +278,12 @@ if ($rSettings["sidebar"]) {
                                                             <div class="col-md-2">
                                                                 <input name="enable_geoip" id="enable_geoip" type="checkbox" <?php if (isset($rServerArr)) { if ($rServerArr["enable_geoip"] == 1) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
-                                                            <label class="col-md-4 col-form-label" for="geoip_type">GeoIP High Priority</label>
-                                                            <div class="col-md-2">
-                                                                <input name="geoip_type" id="geoip_type" type="checkbox" <?php if (isset($rServerArr)) { if ($rServerArr["geoip_type"] == "high_priority") { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            <div class="col-md-6">
+                                                                <select name="geoip_type" id="geoip_type" class="form-control select2" data-toggle="select2">
+                                                                    <?php foreach (Array("high_priority" => "High Priority", "low_priority" => "Low Priority", "strict" => "Strict") as $rType => $rText) { ?>
+                                                                    <option <?php if (isset($rServerArr)) { if ($rServerArr["geoip_type"] == $rType) { echo "selected "; } } ?>value="<?=$rType?>"><?=$rText?></option>
+                                                                    <?php } ?>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">

@@ -1,4 +1,4 @@
-# Beta Release 22E
+# Beta Release 22F
 
 * Now hosting an IP to ISP server to enable ISP support for all users of Xtream UI.
 * Added ISP blocking.

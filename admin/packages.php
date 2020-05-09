@@ -96,8 +96,10 @@ if ($rSettings["sidebar"]) {
                                             </td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "edit_package")) { ?>
-                                                <a href="./package.php?id=<?=$rPackage["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_package"]?>" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_package"]?>" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rPackage["id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
+                                                <div class="btn-group">
+                                                    <a href="./package.php?id=<?=$rPackage["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_package"]?>" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_package"]?>" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rPackage["id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
+                                                </div>
 												<?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>

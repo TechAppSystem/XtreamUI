@@ -64,7 +64,7 @@
                     </li>
                     <?php }
                     if ($rPermissions["is_admin"]) {
-					if ((hasPermissions("adv", "settings")) OR (hasPermissions("adv", "database")) OR (hasPermissions("adv", "block_ips")) OR (hasPermissions("adv", "block_uas")) OR (hasPermissions("adv", "categories")) OR (hasPermissions("adv", "channel_order")) OR (hasPermissions("adv", "epg")) OR (hasPermissions("adv", "folder_watch")) OR (hasPermissions("adv", "mng_groups")) OR (hasPermissions("adv", "mass_delete")) OR (hasPermissions("adv", "mng_packages")) OR (hasPermissions("adv", "process_monitor")) OR (hasPermissions("adv", "rtmp")) OR (hasPermissions("adv", "subresellers")) OR (hasPermissions("adv", "tprofiles"))) { ?>
+					if ((hasPermissions("adv", "settings")) OR (hasPermissions("adv", "database")) OR (hasPermissions("adv", "block_ips")) OR (hasPermissions("adv", "block_isps")) OR (hasPermissions("adv", "block_uas")) OR (hasPermissions("adv", "categories")) OR (hasPermissions("adv", "channel_order")) OR (hasPermissions("adv", "epg")) OR (hasPermissions("adv", "folder_watch")) OR (hasPermissions("adv", "mng_groups")) OR (hasPermissions("adv", "mass_delete")) OR (hasPermissions("adv", "mng_packages")) OR (hasPermissions("adv", "process_monitor")) OR (hasPermissions("adv", "rtmp")) OR (hasPermissions("adv", "subresellers")) OR (hasPermissions("adv", "tprofiles"))) { ?>
                     <li class="dropdown notification-list">
                         <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect text-white" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                             <i class="fe-settings noti-icon"></i>
@@ -75,6 +75,9 @@
 							<?php }
 							if (hasPermissions("adv", "block_ips")) { ?>
 							<a href="./ips.php" class="dropdown-item notify-item"><span><?=$_["blocked_ips"]?></span></a>
+							<?php }
+                            if (hasPermissions("adv", "block_isps")) { ?>
+							<a href="./isps.php" class="dropdown-item notify-item"><span><?=$_["blocked_isps"]?></span></a>
 							<?php }
 							if (hasPermissions("adv", "block_uas")) { ?>
 							<a href="./useragents.php" class="dropdown-item notify-item"><span><?=$_["blocked_uas"]?></span></a>

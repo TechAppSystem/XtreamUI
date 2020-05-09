@@ -56,8 +56,10 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=$rUserAgent["exact_match"]?></td>
                                             <td class="text-center"><?=$rUserAgent["attempts_blocked"]?></td>
                                             <td class="text-center">
-                                                <a href="./useragent.php?id=<?=$rUserAgent["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rUserAgent["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                <div class="btn-group">
+                                                    <a href="./useragent.php?id=<?=$rUserAgent["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rUserAgent["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>

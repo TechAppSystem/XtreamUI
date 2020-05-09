@@ -31,7 +31,7 @@ if ($_GET["id"] == "mag_events") {
         array('db' => 'msg', 'dt' => 4),
         array('db' => 'id', 'dt' => 5,
             'formatter' => function( $d, $row ) {
-                $rButtons = '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete" type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api('.$d.', \'delete\');"><i class="mdi mdi-close"></i></button>';
+                $rButtons = '<button data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete" type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api('.$d.', \'delete\');"><i class="mdi mdi-close"></i></button>';
                 return $rButtons;
             }
         )
@@ -57,8 +57,8 @@ if ($_GET["id"] == "mag_events") {
         ),
         array('db' => 'id', 'dt' => 3,
             'formatter' => function( $d, $row) {
-                return '<button data-id="'.$d.'" data-type="stream" type="button" style="display: none;" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'stream\', true);"><i class="mdi mdi-minus"></i></button>
-                <button data-id="'.$d.'" data-type="stream" type="button" style="display: none;" class="btn-add btn btn-outline-info waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'stream\', true);"><i class="mdi mdi-plus"></i></button>';
+                return '<div class="btn-group"><button data-id="'.$d.'" data-type="stream" type="button" style="display: none;" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'stream\', true);"><i class="mdi mdi-minus"></i></button>
+                <button data-id="'.$d.'" data-type="stream" type="button" style="display: none;" class="btn-add btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'stream\', true);"><i class="mdi mdi-plus"></i></button></div>';
             }
         )
     );
@@ -78,7 +78,7 @@ if ($_GET["id"] == "mag_events") {
         array('db' => 'id', 'dt' => 2,
             'formatter' => function( $d, $row) {
 				if (hasPermissions("adv", "edit_stream")) {
-					return '<a href="./stream.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Stream" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
+					return '<a href="./stream.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Stream" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
 				} else {
 					return '--';
 				}
@@ -101,7 +101,7 @@ if ($_GET["id"] == "mag_events") {
         array('db' => 'id', 'dt' => 2,
             'formatter' => function( $d, $row) {
 				if (hasPermissions("adv", "edit_movie")) {
-					return '<a href="./movie.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Movie" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
+					return '<a href="./movie.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Movie" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
 				} else {
 					return '--';
 				}
@@ -124,7 +124,7 @@ if ($_GET["id"] == "mag_events") {
         array('db' => 'id', 'dt' => 2,
             'formatter' => function( $d, $row) {
 				if (hasPermissions("adv", "edit_radio")) {
-					return '<a href="./radio.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Station" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
+					return '<a href="./radio.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Station" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
 				} else {
 					return '--';
 				}
@@ -147,7 +147,7 @@ if ($_GET["id"] == "mag_events") {
         array('db' => 'id', 'dt' => 2,
             'formatter' => function( $d, $row) {
 				if (hasPermissions("adv", "edit_series")) {
-					return '<a href="./series.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Series" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
+					return '<a href="./series.php?id='.$d.'"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Series" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>';
 				} else {
 					return '--';
 				}
@@ -193,8 +193,8 @@ if ($_GET["id"] == "mag_events") {
         ),
         array('db' => 'type', 'dt' => 3,
             'formatter' => function( $d, $row) {
-                return '<button data-id="'.$row["id"].'" data-type="vod" type="button" style="display: none;" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleSelection('.$row["id"].');"><i class="mdi mdi-minus"></i></button>
-                <button data-id="'.$row["id"].'" data-type="vod" type="button" style="display: none;" class="btn-add btn btn-outline-info waves-effect waves-light btn-xs" onClick="toggleSelection('.$row["id"].');"><i class="mdi mdi-plus"></i></button>';
+                return '<div class="btn-group"><button data-id="'.$row["id"].'" data-type="vod" type="button" style="display: none;" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleSelection('.$row["id"].');"><i class="mdi mdi-minus"></i></button>
+                <button data-id="'.$row["id"].'" data-type="vod" type="button" style="display: none;" class="btn-add btn btn-light waves-effect waves-light btn-xs" onClick="toggleSelection('.$row["id"].');"><i class="mdi mdi-plus"></i></button></div>';
             }
         )
     );
@@ -220,8 +220,8 @@ if ($_GET["id"] == "mag_events") {
         ),
         array('db' => 'id', 'dt' => 3,
             'formatter' => function( $d, $row) {
-                return '<button data-id="'.$d.'" data-type="vod" type="button" style="display: none;" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'vod\', true);"><i class="mdi mdi-minus"></i></button>
-                <button data-id="'.$d.'" data-type="vod" type="button" style="display: none;" class="btn-add btn btn-outline-info waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'vod\', true);"><i class="mdi mdi-plus"></i></button>';
+                return '<div class="btn-group"><button data-id="'.$d.'" data-type="vod" type="button" style="display: none;" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'vod\', true);"><i class="mdi mdi-minus"></i></button>
+                <button data-id="'.$d.'" data-type="vod" type="button" style="display: none;" class="btn-add btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'vod\', true);"><i class="mdi mdi-plus"></i></button></div>';
             }
         )
     );
@@ -247,8 +247,8 @@ if ($_GET["id"] == "mag_events") {
         ),
         array('db' => 'id', 'dt' => 3,
             'formatter' => function( $d, $row) {
-                return '<button data-id="'.$d.'" data-type="series" type="button" style="display: none;" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'series\', true);"><i class="mdi mdi-minus"></i></button>
-                <button data-id="'.$d.'" data-type="series" type="button" style="display: none;" class="btn-add btn btn-outline-info waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'series\', true);"><i class="mdi mdi-plus"></i></button>';
+                return '<div class="btn-group"><button data-id="'.$d.'" data-type="series" type="button" style="display: none;" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'series\', true);"><i class="mdi mdi-minus"></i></button>
+                <button data-id="'.$d.'" data-type="series" type="button" style="display: none;" class="btn-add btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'series\', true);"><i class="mdi mdi-plus"></i></button></div>';
             }
         )
     );
@@ -274,8 +274,8 @@ if ($_GET["id"] == "mag_events") {
         ),
         array('db' => 'id', 'dt' => 3,
             'formatter' => function( $d, $row) {
-                return '<button data-id="'.$d.'" data-type="radios" type="button" style="display: none;" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'radios\', true);"><i class="mdi mdi-minus"></i></button>
-                <button data-id="'.$d.'" data-type="radios" type="button" style="display: none;" class="btn-add btn btn-outline-info waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'radios\', true);"><i class="mdi mdi-plus"></i></button>';
+                return '<div class="btn-group"><button data-id="'.$d.'" data-type="radios" type="button" style="display: none;" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'radios\', true);"><i class="mdi mdi-minus"></i></button>
+                <button data-id="'.$d.'" data-type="radios" type="button" style="display: none;" class="btn-add btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet('.$d.', \'radios\', true);"><i class="mdi mdi-plus"></i></button></div>';
             }
         )
     );

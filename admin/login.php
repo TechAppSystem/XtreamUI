@@ -33,8 +33,9 @@ if (!isset($_STATUS)) {
 						$rNew2F = true;
 					}
 					$rQR = $rGA->getQRCodeGoogleUrl('Xtream UI', $rUserInfo["google_2fa_sec"]);
+                    $rAuth = md5($rUserInfo["password"]);
 				} else if ((strlen($_POST["password"]) < intval($rAdminSettings["pass_length"])) && (intval($rAdminSettings["pass_length"]) > 0)) {
-					$rChangePass = True;
+					$rChangePass = md5($rUserInfo["password"]);
 				} else {
 					$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 					if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
@@ -43,14 +44,14 @@ if (!isset($_STATUS)) {
 						$_SESSION['ip'] = getIP();
 						if ($rPermissions["is_admin"]) {
 							if (strlen($_POST["referrer"]) > 0) {
-								header("Location: .".$_POST["referrer"]);
+								header("Location: .".ESC($_POST["referrer"]));
 							} else {
 								header("Location: ./dashboard.php");
 							}
 						} else {
 							$db->query("INSERT INTO `reg_userlog`(`owner`, `username`, `password`, `date`, `type`) VALUES(".intval($rUserInfo["id"]).", '', '', ".intval(time()).", '[<b>UserPanel</b> -> <u>".$_["logged_in"]."</u>]');");
 							if (strlen($_POST["referrer"]) > 0) {
-								header("Location: .".$_POST["referrer"]);
+								header("Location: .".ESC($_POST["referrer"]));
 							} else {
 								header("Location: ./reseller.php");
 							}
@@ -70,9 +71,10 @@ if (!isset($_STATUS)) {
 				$_STATUS = 0;
 			}
 		}
-	} else if ((isset($_POST["gauth"])) && (isset($_POST["hash"]))) {
+	} else if ((isset($_POST["gauth"])) && (isset($_POST["hash"])) && (isset($_POST["auth"])) && (isset($rAdminSettings["google_2factor"])) && ($rAdminSettings["google_2factor"])) {
 		$rUserInfo = getRegisteredUserHash($_POST["hash"]);
-		if ($rUserInfo) {
+        $rAuth = $_POST["auth"];
+		if (($rUserInfo) && ($rAuth == md5($rUserInfo["password"]))) {
 			if ($rGA->verifyCode($rUserInfo["google_2fa_sec"], $_POST["gauth"], 2)) {
 				$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 				if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
@@ -102,10 +104,10 @@ if (!isset($_STATUS)) {
 			}
 			$_STATUS = 0;
 		}
-	} else if ((isset($_POST["newpass"])) && (isset($_POST["confirm"])) && (isset($_POST["hash"]))) {
+	} else if ((isset($_POST["newpass"])) && (isset($_POST["confirm"])) && (isset($_POST["hash"])) && (isset($_POST["change"]))) {
 		$rUserInfo = getRegisteredUserHash($_POST["hash"]);
-		if ($rUserInfo) {
-			$rChangePass = True;
+        $rChangePass = $_POST["change"];
+		if (($rUserInfo) && ($rChangePass == md5($rUserInfo["password"]))) {
 			if (($_POST["newpass"] == $_POST["confirm"]) && (strlen($_POST["newpass"]) >= intval($rAdminSettings["pass_length"]))) {
 				$rPermissions = getPermissions($rUserInfo["member_group_id"]);
 				if (($rPermissions) && ((($rPermissions["is_admin"]) OR ($rPermissions["is_reseller"])) && ((!$rPermissions["is_banned"]) && ($rUserInfo["status"] == 1)))) {
@@ -221,7 +223,7 @@ if (!isset($_STATUS)) {
                                 <h5 class="auth-title"><?=$_["admin_reseller_interface"]?></h5>
 								<?php if ((!isset($_STATUS)) OR ($_STATUS <> 7)) { ?>
                                 <form action="./login.php" method="POST" data-parsley-validate="" id="login_form">
-                                    <input type="hidden" name="referrer" value="<?=$_GET["referrer"]?>" />
+                                    <input type="hidden" name="referrer" value="<?=ESC($_GET["referrer"])?>" />
                                     <?php if ((!isset($rQR)) && (!isset($rChangePass))) { ?>
                                     <div class="form-group mb-3" id="username_group">
                                         <label for="username"><?=$_["username"]?></label>
@@ -238,6 +240,7 @@ if (!isset($_STATUS)) {
 									<?php }
                                     } else if (isset($rChangePass)) { ?>
 									<input type="hidden" name="hash" value="<?=md5($rUserInfo["username"])?>" />
+                                    <input type="hidden" name="change" value="<?=$rChangePass?>" />
 									<div class="form-group mb-3 text-center">
                                         <p><?=str_replace("{num}", $rAdminSettings["pass_length"], $_["login_message_9"])?></p>
                                     </div>
@@ -251,6 +254,7 @@ if (!isset($_STATUS)) {
                                     </div>
 									<?php } else { ?>
                                     <input type="hidden" name="hash" value="<?=md5($rUserInfo["username"])?>" />
+                                    <input type="hidden" name="auth" value="<?=$rAuth?>" />
                                     <?php if (isset($rNew2F)) { ?>
                                     <div class="form-group mb-3 text-center">
                                         <p><?=$_["login_message_10"]?></p>

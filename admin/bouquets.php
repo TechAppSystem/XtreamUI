@@ -35,7 +35,6 @@ if ($rSettings["sidebar"]) {
                     </div>
                 </div>     
                 <!-- end page title --> 
-
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -59,9 +58,11 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=count(json_decode($rBouquet["bouquet_series"], True))?></td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "edit_bouquet")) { ?>
-                                                <a href="./bouquet_order.php?id=<?=$rBouquet["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["reorder_bouquet"]?>" class="btn btn-outline-primary waves-effect waves-light btn-xs"><i class="mdi mdi-format-line-spacing"></i></button></a>
-                                                <a href="./bouquet.php?id=<?=$rBouquet["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_bouquet"]?>" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_bouquet"]?>" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rBouquet["id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
+                                                <div class="btn-group">
+                                                    <a href="./bouquet_order.php?id=<?=$rBouquet["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["reorder_bouquet"]?>" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-format-line-spacing"></i></button></a>
+                                                    <a href="./bouquet.php?id=<?=$rBouquet["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_bouquet"]?>" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_bouquet"]?>" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rBouquet["id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
+                                                </div>
 												<?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>

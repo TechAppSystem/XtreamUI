@@ -71,6 +71,25 @@ if (isset($_POST["submit_user"])) {
                 }
             }
         }
+        if ((isset($_POST["c_lock_device"])) OR (isset($_POST["reset_stb_lock"]))) {
+            $rResult = $db->query("SELECT `mag_id`, `user_id` FROM `mag_devices`;");
+            if (($rResult) && ($rResult->num_rows > 0)) {
+                while ($rRow = $rResult->fetch_assoc()) {
+                    if (in_array($rRow["user_id"], $rUsers)) {
+                        if (isset($_POST["reset_stb_lock"])) {
+                            resetSTB($rRow["mag_id"]);
+                        }
+                        if (isset($_POST["c_lock_device"])) {
+                            if (isset($_POST["lock_device"])) {
+                                $db->query("UPDATE `mag_devices` SET `lock_device` = 1 WHERE `mag_id` = ".intval($rRow["mag_id"]).";");
+                            } else {
+                                $db->query("UPDATE `mag_devices` SET `lock_device` = 0 WHERE `mag_id` = ".intval($rRow["mag_id"]).";");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     $_STATUS = 0;
 }
@@ -289,12 +308,12 @@ if ($rSettings["sidebar"]) {
                                                             <div class="col-md-2">
                                                                 <input disabled name="is_stalker" id="is_stalker" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
-                                                            <label class="col-md-3 col-form-label" for="is_mag">MAG Device</label>
+                                                            <label class="col-md-3 col-form-label" for="is_restreamer">Restreamer</label>
                                                             <div class="col-md-2">
-                                                                <input disabled name="is_mag" id="is_mag" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                                <input disabled name="is_restreamer" id="is_restreamer" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                             <div class="checkbox checkbox-single col-md-1 checkbox-offset checkbox-primary">
-                                                                <input type="checkbox" class="activate" data-name="is_mag" data-type="switch" name="c_is_mag">
+                                                                <input type="checkbox" class="activate" data-name="is_restreamer" data-type="switch" name="c_is_restreamer">
                                                                 <label></label>
                                                             </div>
                                                         </div>
@@ -307,12 +326,27 @@ if ($rSettings["sidebar"]) {
                                                             <div class="col-md-2">
                                                                 <input disabled name="is_e2" id="is_e2" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
-                                                            <label class="col-md-3 col-form-label" for="is_restreamer">Restreamer</label>
+                                                            <label class="col-md-3 col-form-label" for="is_mag">MAG Device</label>
                                                             <div class="col-md-2">
-                                                                <input disabled name="is_restreamer" id="is_restreamer" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                                <input disabled name="is_mag" id="is_mag" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                             <div class="checkbox checkbox-single col-md-1 checkbox-offset checkbox-primary">
-                                                                <input type="checkbox" class="activate" data-name="is_restreamer" data-type="switch" name="c_is_restreamer">
+                                                                <input type="checkbox" class="activate" data-name="is_mag" data-type="switch" name="c_is_mag">
+                                                                <label></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mb-4">
+                                                            <div class="checkbox checkbox-single col-md-1 checkbox-offset checkbox-primary">
+                                                                <input type="checkbox" class="activate" data-name="lock_device" data-type="switch" name="c_lock_device">
+                                                                <label></label>
+                                                            </div>
+                                                            <label class="col-md-3 col-form-label" for="lock_device">MAG STB Lock</label>
+                                                            <div class="col-md-2">
+                                                                <input disabled name="lock_device" id="lock_device" type="checkbox" data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                            <label class="col-md-5 col-form-label" for="reset_stb_lock">Reset STB Lock</label>
+                                                            <div class="checkbox checkbox-single col-md-1 checkbox-offset checkbox-primary">
+                                                                <input type="checkbox" name="reset_stb_lock">
                                                                 <label></label>
                                                             </div>
                                                         </div>

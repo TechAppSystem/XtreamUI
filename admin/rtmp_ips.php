@@ -56,10 +56,12 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=$rIP["ip"]?></td>
                                             <td><?=$rIP["notes"]?></td>
                                             <td class="text-center">
-												<?php if (hasPermissions("adv", "add_rtmp")) { ?>
-                                                <a href="./rtmp_ip.php?id=<?=$rIP["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-												<?php } ?>
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rIP["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                <div class="btn-group">
+                                                    <?php if (hasPermissions("adv", "add_rtmp")) { ?>
+                                                    <a href="./rtmp_ip.php?id=<?=$rIP["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <?php } ?>
+                                                    <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rIP["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>

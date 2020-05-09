@@ -65,9 +65,11 @@ if ($rSettings["sidebar"]) {
                                             <td><?=$rMemberGroups[$rItem["subreseller"]]["group_name"]?></td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "subreseller")) { ?>
-                                                <a href="./subreseller_setup.php?id=<?=$rItem["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rItem["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
-												<?php } else { echo "--"; } ?>
+                                                <div class="btn-group">
+                                                    <a href="./subreseller_setup.php?id=<?=$rItem["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rItem["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+												</div>
+                                                <?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>
                                         <?php } ?>

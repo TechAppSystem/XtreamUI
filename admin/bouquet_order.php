@@ -212,7 +212,7 @@ if ($rSettings["sidebar"]) {
                                                         <p class="sub-header">
                                                             <?=$_["bouquet_order_sort_text"]?>
                                                         </p>
-                                                        <select multiple id="sort_series" class="form-control" style="min-height:400px;">
+                                                        <select multiple id="sort_radio" class="form-control" style="min-height:400px;">
                                                         <?php foreach ($rOrdered["radio"] as $rStream) { ?>
                                                             <option value="<?=$rStream["id"]?>"><?=$rStream["stream_display_name"]?></option>
                                                         <?php } ?>

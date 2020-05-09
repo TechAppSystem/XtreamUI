@@ -109,8 +109,10 @@ if ($rSettings["sidebar"]) {
                                                                     <div class="dd3-content"><?=$rCategory["category_name"]?>
                                                                         <span style="float:right;">
 																			<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                            <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                            <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+                                                                            <div class="btn-group">
+                                                                                <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+                                                                            </div>
 																			<?php } ?>
                                                                         </span>
                                                                     </div>
@@ -122,8 +124,10 @@ if ($rSettings["sidebar"]) {
                                                                             <div class="dd3-content"><?=$rSubCategory["category_name"]?>
                                                                                 <span style="float:right;">
 																					<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                                    <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                                    <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+                                                                                    <div class="btn-group">
+                                                                                        <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                        <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+                                                                                    </div>
 																					<?php } ?>
                                                                                 </span>
                                                                             </div>
@@ -160,9 +164,11 @@ if ($rSettings["sidebar"]) {
                                                                     <div class="dd3-content"><?=$rCategory["category_name"]?>
                                                                         <span style="float:right;">
 																			<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                            <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                            <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																			<?php } ?>
+                                                                            <div class="btn-group">
+                                                                                <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																			</div>
+                                                                            <?php } ?>
                                                                         </span>
                                                                     </div>
                                                                     <?php if (isset($rSubCategories[2][$rCategory["id"]])) { ?>
@@ -173,9 +179,11 @@ if ($rSettings["sidebar"]) {
                                                                             <div class="dd3-content"><?=$rSubCategory["category_name"]?>
                                                                                 <span style="float:right;">
 																					<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                                    <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                                    <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																					<?php } ?>
+                                                                                    <div class="btn-group">
+                                                                                        <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                        <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																					</div>
+                                                                                    <?php } ?>
                                                                                 </span>
                                                                             </div>
                                                                         </li>
@@ -211,9 +219,11 @@ if ($rSettings["sidebar"]) {
                                                                     <div class="dd3-content"><?=$rCategory["category_name"]?>
                                                                         <span style="float:right;">
 																			<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                            <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                            <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																			<?php } ?>
+                                                                            <div class="btn-group">
+                                                                                <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																			</div>
+                                                                            <?php } ?>
                                                                         </span>
                                                                     </div>
                                                                     <?php if (isset($rSubCategories[3][$rCategory["id"]])) { ?>
@@ -224,9 +234,11 @@ if ($rSettings["sidebar"]) {
                                                                             <div class="dd3-content"><?=$rSubCategory["category_name"]?>
                                                                                 <span style="float:right;">
 																					<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                                    <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                                    <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																					<?php } ?>
+                                                                                    <div class="btn-group">
+                                                                                        <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                        <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																					</div>
+                                                                                    <?php } ?>
                                                                                 </span>
                                                                             </div>
                                                                         </li>
@@ -262,9 +274,11 @@ if ($rSettings["sidebar"]) {
                                                                     <div class="dd3-content"><?=$rCategory["category_name"]?>
                                                                         <span style="float:right;">
 																			<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                            <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                            <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																			<?php } ?>
+                                                                            <div class="btn-group">
+                                                                                <a href="./stream_category.php?id=<?=$rCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																			</div>
+                                                                            <?php } ?>
                                                                         </span>
                                                                     </div>
                                                                     <?php if (isset($rSubCategories[4][$rCategory["id"]])) { ?>
@@ -275,9 +289,11 @@ if ($rSettings["sidebar"]) {
                                                                             <div class="dd3-content"><?=$rSubCategory["category_name"]?>
                                                                                 <span style="float:right;">
 																					<?php if (hasPermissions("adv", "edit_cat")) { ?>
-                                                                                    <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                                                    <button type="button" class="btn btn-outline-danger waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
-																					<?php } ?>
+                                                                                    <div class="btn-group">
+                                                                                        <a href="./stream_category.php?id=<?=$rSubCategory["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                                                        <button type="button" class="btn btn-light waves-effect waves-light" onClick="deleteCategory(<?=$rSubCategory["id"]?>)"><i class="mdi mdi-close"></i></button>
+																					</div>
+                                                                                    <?php } ?>
                                                                                 </span>
                                                                             </div>
                                                                         </li>

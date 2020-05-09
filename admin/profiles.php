@@ -58,9 +58,11 @@ if ($rSettings["sidebar"]) {
                                             <td><?=(strlen($rProfile["profile_options"]) > 100 ? substr($rProfile["profile_options"],0,100)."..." : $rProfile["profile_options"])?></td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "edit_tprofile")) { ?>
-                                                <a href="./profile.php?id=<?=$rProfile["profile_id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rProfile["profile_id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
-												<?php } else { echo "--"; } ?>
+                                                <div class="btn-group">
+                                                    <a href="./profile.php?id=<?=$rProfile["profile_id"]?>"><button type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rProfile["profile_id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+												</div>
+                                                <?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>
                                         <?php } ?>

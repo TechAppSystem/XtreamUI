@@ -74,12 +74,14 @@ if ($rSettings["sidebar"]) {
                                                 </div>
                                             </td>
                                             <td class="text-center">
-												<?php if (hasPermissions("adv", "edit_group")) { ?>
-                                                <a href="./group.php?id=<?=$rGroup["group_id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_group"]?>" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-												<?php if ($rGroup["can_delete"]) { ?>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_group"]?>" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rGroup["group_id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
-                                                <?php }
-												} else { echo "--"; } ?>
+                                                <div class="btn-group">
+                                                    <?php if (hasPermissions("adv", "edit_group")) { ?>
+                                                    <a href="./group.php?id=<?=$rGroup["group_id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_group"]?>" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <?php if ($rGroup["can_delete"]) { ?>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_group"]?>" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rGroup["group_id"]?>, 'delete');""><i class="mdi mdi-close"></i></button>
+                                                    <?php }
+                                                    } ?>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>

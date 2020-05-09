@@ -21,6 +21,7 @@ $rAdvPermissions = Array(
 	Array("add_series", $_["permission_add_series"], $_["permission_add_series_text"]),
 	Array("add_user", $_["permission_add_user"], $_["permission_add_user_text"]),
 	Array("block_ips", $_["permission_block_ips"], $_["permission_block_ips_text"]),
+    Array("block_isps", $_["permission_block_isps"], $_["permission_block_isps_text"]),
 	Array("block_uas", $_["permission_block_uas"], $_["permission_block_uas_text"]),
 	Array("create_channel", $_["permission_create_channel"], $_["permission_create_channel_text"]),
 	Array("edit_bouquet", $_["permission_edit_bouquet"], $_["permission_edit_bouquet_text"]),

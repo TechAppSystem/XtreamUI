@@ -3,28 +3,32 @@ include "session.php"; include "functions.php";
 if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "block_ips"))) { exit; }
 
 if (isset($_POST["submit_ip"])) {
-    $rArray = Array("ip" => $_POST["ip"], "notes" => $_POST["notes"], "date" => time(), "attempts_blocked" => 0);
-    $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
-    foreach (array_values($rArray) as $rValue) {
-        isset($rValues) ? $rValues .= ',' : $rValues = '';
-        if (is_array($rValue)) {
-            $rValue = json_encode($rValue);
+    if (filter_var($_POST["ip"], FILTER_VALIDATE_IP)) {
+        $rArray = Array("ip" => $_POST["ip"], "notes" => $_POST["notes"], "date" => time(), "attempts_blocked" => 0);
+        $rCols = "`".ESC(implode('`,`', array_keys($rArray)))."`";
+        foreach (array_values($rArray) as $rValue) {
+            isset($rValues) ? $rValues .= ',' : $rValues = '';
+            if (is_array($rValue)) {
+                $rValue = json_encode($rValue);
+            }
+            if (is_null($rValue)) {
+                $rValues .= 'NULL';
+            } else {
+                $rValues .= '\''.ESC($rValue).'\'';
+            }
         }
-        if (is_null($rValue)) {
-            $rValues .= 'NULL';
+        $rQuery = "REPLACE INTO `blocked_ips`(".$rCols.") VALUES(".$rValues.");";
+        if ($db->query($rQuery)) {
+            shell_exec("sudo /sbin/iptables -A INPUT -s ".escapeshellcmd($rArray["ip"])." -j DROP");
+            $rInsertID = $db->insert_id;
+        }
+        if (isset($rInsertID)) {
+            header("Location: ./ips.php");exit;
         } else {
-            $rValues .= '\''.ESC($rValue).'\'';
+            $_STATUS = 1;
         }
-    }
-    $rQuery = "REPLACE INTO `blocked_ips`(".$rCols.") VALUES(".$rValues.");";
-    if ($db->query($rQuery)) {
-        shell_exec("sudo /sbin/iptables -A INPUT -s ".$rArray["ip"]." -j DROP");
-		$rInsertID = $db->insert_id;
-    }
-    if (isset($rInsertID)) {
-        header("Location: ./ips.php");exit;
     } else {
-        $_STATUS = 1;
+        $_STATUS = 2;
     }
 }
 
@@ -61,12 +65,19 @@ if ($rSettings["sidebar"]) {
                             </button>
                             <?=$_["block_ip_success"]?>
                         </div>
-                        <?php } else if ((isset($_STATUS)) && ($_STATUS > 0)) { ?>
+                        <?php } else if ((isset($_STATUS)) && ($_STATUS == 1)) { ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                             <?=$_["generic_fail"]?>
+                        </div>
+                        <?php } else if ((isset($_STATUS)) && ($_STATUS == 2)) { ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            Please enter a valid IP address.
                         </div>
                         <?php } ?>
                         <div class="card">

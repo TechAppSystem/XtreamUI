@@ -74,11 +74,13 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=$rSystem["avail"]?></td>
                                             <td class="text-center"><?php if(intval(rtrim($rSystem["percentage"], "%")) >= 80) { echo "<span class='text-danger'>".$rSystem["percentage"]."</span>"; } else { echo $rSystem["percentage"]; }; ?></td>
                                             <td class="text-center">
-                                                <?php if (substr($rSystem["mount"], strlen($rSystem["mount"])-3, 3) == "tmp") { ?>
-                                                <a href="./process_monitor.php?server=<?=$_GET["server"]?>&clear"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["clear_temp"]?>" type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button></a>
-                                                <?php } else if (substr($rSystem["mount"], strlen($rSystem["mount"])-7, 7) == "streams") { ?>
-												<a href="./process_monitor.php?server=<?=$_GET["server"]?>&clear_s"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["clear_streams"]?>" type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button></a>
-                                                <?php } ?>
+                                                <div class="btn-group">
+                                                    <?php if (substr($rSystem["mount"], strlen($rSystem["mount"])-3, 3) == "tmp") { ?>
+                                                    <a href="./process_monitor.php?server=<?=$_GET["server"]?>&clear"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["clear_temp"]?>" type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button></a>
+                                                    <?php } else if (substr($rSystem["mount"], strlen($rSystem["mount"])-7, 7) == "streams") { ?>
+                                                    <a href="./process_monitor.php?server=<?=$_GET["server"]?>&clear_s"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["clear_streams"]?>" type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button></a>
+                                                    <?php } ?>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>
@@ -136,16 +138,18 @@ if ($rSettings["sidebar"]) {
                                             <td><?=number_format($rProcess["rss"] / 1024.0, 0)?></td>
                                             <td><?=$rProcess["time"]?></td>
                                             <td>
-                                                <?php if (isset($rStreams[$rProcess["pid"]])) { ?>
-                                                <a href="<?=Array(1 => "stream", 2 => "movie", 3 => "created_channel", 4 => "radio", 5 => "episode")[$rStreams[$rProcess["pid"]]["type"]].".php?id=".$rStreams[$rProcess["pid"]]["id"]?>"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["view"]?>" type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-eye"></i></button></a>
-                                                <?php } else { ?>
-                                                <button disabled type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-eye"></i></button>
-                                                <?php }
-                                                if ($rProcess["user"] == "xtreamc+") { ?>
-                                                <button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["kill_process_info"]?>" type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="kill(<?=$_GET["server"]?>, <?=$rProcess["pid"]?>);"><i class="mdi mdi-close"></i></button>
-                                                <?php } else { ?>
-                                                <button disabled type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button>
-                                                <?php } ?>
+                                                <div class="btn-group">
+                                                    <?php if (isset($rStreams[$rProcess["pid"]])) { ?>
+                                                    <a href="<?=Array(1 => "stream", 2 => "movie", 3 => "created_channel", 4 => "radio", 5 => "episode")[$rStreams[$rProcess["pid"]]["type"]].".php?id=".$rStreams[$rProcess["pid"]]["id"]?>"><button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["view"]?>" type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-eye"></i></button></a>
+                                                    <?php } else { ?>
+                                                    <button disabled type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-eye"></i></button>
+                                                    <?php }
+                                                    if ($rProcess["user"] == "xtreamc+") { ?>
+                                                    <button data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["kill_process_info"]?>" type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="kill(<?=$_GET["server"]?>, <?=$rProcess["pid"]?>);"><i class="mdi mdi-close"></i></button>
+                                                    <?php } else { ?>
+                                                    <button disabled type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button>
+                                                    <?php } ?>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>

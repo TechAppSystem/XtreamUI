@@ -65,9 +65,11 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?php if ($rEPG["last_updated"]) { echo date("Y-m-d H:i:s", $rEPG["last_updated"]); } else { echo $_["never"]; } ?></td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "epg_edit")) { ?>
-                                                <a href="./epg.php?id=<?=$rEPG["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_epg"]?>" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_epg"]?>" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rEPG["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
-												<?php } else { echo "--"; } ?>
+                                                <div class="btn-group">
+                                                    <a href="./epg.php?id=<?=$rEPG["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["edit_epg"]?>" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="<?=$_["delete_epg"]?>" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rEPG["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+												</div>
+                                                <?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>
                                         <?php } ?>

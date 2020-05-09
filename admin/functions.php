@@ -2,33 +2,38 @@
 include_once("/home/xtreamcodes/iptv_xtream_codes/admin/HTMLPurifier.standalone.php");
 
 $rRelease = 22;             // Official Beta Release Number
-$rEarlyAccess = "E";	   	// Early Access Release
+$rEarlyAccess = "F";	   	// Early Access Release
 $rTimeout = 60;             // Seconds Timeout for Functions & Requests
 $rSQLTimeout = 5;           // Max execution time for MySQL queries.
 $rDebug = False;
 $rPurifier = new HTMLPurifier(HTMLPurifier_Config::createDefault());
 
-function XSS($rString) {
-    global $rPurifier;
+function XSS($rString, $rSQL = False) {
+    global $rPurifier, $db;
     if ((is_null($rString)) OR (strtoupper($rString) == 'NULL')) {
         return null;
     } else if (is_array($rString)) {
-        return XSSRow($rString);
+        return XSSRow($rString, $rSQL);
+    } else if ($rSQL) {
+        return $db->real_escape_string(str_replace("&quot;", '"', str_replace("&amp;", "&", $rPurifier->purify($rString))));
     } else {
         return str_replace("&quot;", '"', str_replace("&amp;", "&", $rPurifier->purify($rString)));
     }
 }
 
-function XSSRow($rRow) {
+function XSSRow($rRow, $rSQL = False) {
     foreach ($rRow as $rKey => $rValue) {
-        $rRow[$rKey] = XSS($rValue);
+        if (is_array($rValue)) {
+            $rRow[$rKey] = XSSRow($rValue, $rSQL);
+        } else {
+            $rRow[$rKey] = XSS($rValue, $rSQL);
+        }
     }
     return $rRow;
 }
 
 function ESC($rString) {
-    global $db;
-    return XSS($db->real_escape_string($rString));
+    return XSS($rString, True);
 }
 
 function sortArrayByArray(array $rArray, array $rSort) {
@@ -44,18 +49,23 @@ function sortArrayByArray(array $rArray, array $rSort) {
 
 function updateGeoLite2() {
     global $rAdminSettings;
-    $rURL = "http://xtream-ui.com/GeoLite2/status.json";
+    $rURL = "https://xtream-ui.com/GeoLite2/status.json";
     $rData = json_decode(file_get_contents($rURL), True);
     if ($rData["version"]) {
-        $rFileData = file_get_contents("http://xtream-ui.com/GeoLite2/GeoLite2.mmdb");
+        $rFileData = file_get_contents("https://xtream-ui.com/GeoLite2/GeoLite2.mmdb");
         if (stripos($rFileData, "MaxMind.com") !== false) {
             $rFilePath = "/home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb";
             exec("sudo chattr -i {$rFilePath}");
+            unlink($rFilePath);
             file_put_contents($rFilePath, $rFileData);
             exec("sudo chattr +i {$rFilePath}");
-            $rAdminSettings["geolite2_version"] = $rData["version"];
-            writeAdminSettings();
-            return true;
+            if (file_get_contents($rFilePath) == $rFileData) {
+                $rAdminSettings["geolite2_version"] = $rData["version"];
+                writeAdminSettings();
+                return true;
+            } else {
+                return false;
+            }
         }
     }
     return false;
@@ -313,7 +323,7 @@ function roundUpToAny($n,$x=5) {
 
 function checkSource($rServerID, $rFilename) {
     global $rServers, $rSettings;
-    $rAPI = "http://".$rServers[intval($rServerID)]["server_ip"].":".$rServers[intval($rServerID)]["http_broadcast_port"]."/system_api.php?password=".$rSettings["live_streaming_pass"]."&action=getFile&filename=".urlencode($rFilename);
+    $rAPI = "http://".$rServers[intval($rServerID)]["server_ip"].":".$rServers[intval($rServerID)]["http_broadcast_port"]."/system_api.php?password=".$rSettings["live_streaming_pass"]."&action=getFile&filename=".urlencode(escapeshellcmd($rFilename));
     $rCommand = 'timeout 5 '.MAIN_DIR.'bin/ffprobe -show_streams -v quiet "'.$rAPI.'" -of json';
     return json_decode(shell_exec($rCommand), True);
 }
@@ -345,7 +355,7 @@ function getBackups() {
 }
 
 function parseRelease($rRelease) {
-    $rCommand = "/usr/bin/python ".MAIN_DIR."pytools/release.py \"".$rRelease."\"";
+    $rCommand = "/usr/bin/python ".MAIN_DIR."pytools/release.py \"".escapeshellcmd($rRelease)."\"";
     return json_decode(shell_exec($rCommand), True);
 }
 
@@ -369,28 +379,46 @@ function listDir($rServerID, $rDirectory, $rAllowed=null) {
             }
         }
     } else {
-        $rFilename = tempnam(MAIN_DIR.'tmp/', 'ls_');
-        $rCommand = "ls -cm -f --group-directories-first --indicator-style=slash \"".$rDirectory."\" >> ".$rFilename;
-        sexec($rServerID, $rCommand);
-        $rData = ""; $rI = 2;
-        while (strlen($rData) == 0) {
-            $rData = SystemAPIRequest($rServerID, Array('action' => 'getFile', 'filename' => $rFilename));
-            $rI --;
-            if (($rI == 0) OR (strlen($rData) > 0)) { break; }
-            sleep(1);
-        }
-        if (strlen($rData) > 0) {
-            $rFiles = explode(",", $rData);
-            foreach($rFiles as $rFile) {
-                $rFile = trim($rFile);
-                if (substr($rFile, -1) == "/") {
-                    if ((substr($rFile, 0, -1) <> "..") && (substr($rFile, 0, -1) <> ".")) {
-                        $rReturn["dirs"][] = substr($rFile, 0, -1);
+        if ($rAdminSettings["alternate_scandir"]) {
+            $rFilename = tempnam(MAIN_DIR.'tmp/', 'ls_');
+            $rCommand = "ls -cm -f --group-directories-first --indicator-style=slash \"".escapeshellcmd($rDirectory)."\" >> ".$rFilename;
+            sexec($rServerID, $rCommand);
+            $rData = ""; $rI = 2;
+            while (strlen($rData) == 0) {
+                $rData = SystemAPIRequest($rServerID, Array('action' => 'getFile', 'filename' => $rFilename));
+                $rI --;
+                if (($rI == 0) OR (strlen($rData) > 0)) { break; }
+                sleep(1);
+            }
+            if (strlen($rData) > 0) {
+                $rFiles = explode(",", $rData);
+                sort($rFiles);
+                foreach($rFiles as $rFile) {
+                    $rFile = trim($rFile);
+                    if (substr($rFile, -1) == "/") {
+                        if ((substr($rFile, 0, -1) <> "..") && (substr($rFile, 0, -1) <> ".")) {
+                            $rReturn["dirs"][] = substr($rFile, 0, -1);
+                        }
+                    } else {
+                        $rExt = strtolower(pathinfo($rFile)["extension"]);
+                        if (((is_array($rAllowed)) && (in_array($rExt, $rAllowed))) OR (!$rAllowed)) {
+                            $rReturn["files"][] = $rFile;
+                        }
                     }
-                } else {
-                    $rExt = strtolower(pathinfo($rFile)["extension"]);
+                }
+            }
+        } else {
+            $rData = SystemAPIRequest($rServerID, Array('action' => 'viewDir', 'dir' => $rDirectory));
+            $rDocument = new DOMDocument();
+            $rDocument->loadHTML($rData);
+            $rFiles = $rDocument->getElementsByTagName('li');
+            foreach($rFiles as $rFile) {
+                if (stripos($rFile->getAttribute('class'), "directory") !== false) {
+                    $rReturn["dirs"][] = $rFile->nodeValue;
+                } else if (stripos($rFile->getAttribute('class'), "file") !== false) {
+                    $rExt = strtolower(pathinfo($rFile->nodeValue)["extension"]);
                     if (((is_array($rAllowed)) && (in_array($rExt, $rAllowed))) OR (!$rAllowed)) {
-                        $rReturn["files"][] = $rFile;
+                        $rReturn["files"][] = $rFile->nodeValue;
                     }
                 }
             }
@@ -683,6 +711,18 @@ function getUserAgents() {
     global $db;
     $return = Array();
     $result = $db->query("SELECT * FROM `blocked_user_agents` ORDER BY `id` ASC;");
+    if (($result) && ($result->num_rows > 0)) {
+        while ($row = $result->fetch_assoc()) {
+            $return[] = $row;
+        }
+    }
+    return $return;
+}
+
+function getISPs() {
+    global $db;
+    $return = Array();
+    $result = $db->query("SELECT * FROM `isp_addon` ORDER BY `id` ASC;");
     if (($result) && ($result->num_rows > 0)) {
         while ($row = $result->fetch_assoc()) {
             $return[] = $row;
@@ -1031,6 +1071,15 @@ function getUserAgent($rID) {
     return null;
 }
 
+function getISP($rID) {
+    global $db;
+    $result = $db->query("SELECT * FROM `isp_addon` WHERE `id` = ".intval($rID).";");
+    if (($result) && ($result->num_rows == 1)) {
+        return $result->fetch_assoc();
+    }
+    return null;
+}
+
 function getBlockedIP($rID) {
     global $db;
     $result = $db->query("SELECT * FROM `blocked_ips` WHERE `id` = ".intval($rID).";");
@@ -1141,18 +1190,18 @@ function getEnigma($rID) {
 
 function getMAGUser($rID) {
     global $db;
-    $result = $db->query("SELECT `mac` FROM `mag_devices` WHERE `user_id` = ".intval($rID).";");
+    $result = $db->query("SELECT * FROM `mag_devices` WHERE `user_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return base64_decode($result->fetch_assoc()["mac"]);
+        return $result->fetch_assoc();
     }
     return "";
 }
 
 function getE2User($rID) {
     global $db;
-    $result = $db->query("SELECT `mac` FROM `enigma2_devices` WHERE `user_id` = ".intval($rID).";");
+    $result = $db->query("SELECT * FROM `enigma2_devices` WHERE `user_id` = ".intval($rID).";");
     if (($result) && ($result->num_rows == 1)) {
-        return $result->fetch_assoc()["mac"];
+        return $result->fetch_assoc();
     }
     return "";
 }
@@ -1685,10 +1734,7 @@ function updateTMDbCategories() {
 function forceSecurity() {
     global $db;
     $db->query("UPDATE `settings` SET `double_auth` = 1, `mag_security` = 1;");
-    $db->query("UPDATE `mag_devices` SET `lock_device` = 1;");
     $db->query("UPDATE `admin_settings` SET `pass_length` = 8 WHERE `pass_length` < 8;");
-    $db->query("ALTER TABLE `mag_devices` CHANGE COLUMN `lock_device` `lock_device` TINYINT(4) NOT NULL DEFAULT '1';");
-    $db->query("UPDATE `settings` SET `allow_countries` = '[\"A1\",\"A2\",\"O1\",\"AF\",\"AX\",\"AL\",\"DZ\",\"AS\",\"AD\",\"AO\",\"AI\",\"AQ\",\"AG\",\"AR\",\"AM\",\"AW\",\"AU\",\"AT\",\"AZ\",\"BS\",\"BH\",\"BD\",\"BB\",\"BY\",\"BE\",\"BZ\",\"BJ\",\"BM\",\"BT\",\"BO\",\"BA\",\"BW\",\"BV\",\"BR\",\"IO\",\"BN\",\"BG\",\"BF\",\"BI\",\"KH\",\"CM\",\"CA\",\"CV\",\"KY\",\"CF\",\"TD\",\"CL\",\"CN\",\"CX\",\"CC\",\"CO\",\"KM\",\"CG\",\"CD\",\"CK\",\"CR\",\"CI\",\"HR\",\"CU\",\"CW\",\"CY\",\"CZ\",\"DK\",\"DJ\",\"DM\",\"DO\",\"EC\",\"EG\",\"SV\",\"GQ\",\"ER\",\"EE\",\"ET\",\"EU\",\"FK\",\"FO\",\"FJ\",\"FI\",\"FR\",\"GF\",\"PF\",\"TF\",\"MK\",\"GA\",\"GM\",\"GE\",\"DE\",\"GH\",\"GI\",\"GR\",\"GL\",\"GD\",\"GP\",\"GU\",\"GT\",\"GG\",\"GN\",\"GW\",\"GY\",\"HT\",\"HM\",\"VA\",\"HN\",\"HK\",\"HU\",\"IS\",\"IN\",\"ID\",\"IR\",\"IQ\",\"IE\",\"IM\",\"IL\",\"IT\",\"JM\",\"JP\",\"JE\",\"JO\",\"KZ\",\"KE\",\"KI\",\"KR\",\"KV\",\"KW\",\"KG\",\"LA\",\"LV\",\"LB\",\"LS\",\"LR\",\"LY\",\"LI\",\"LT\",\"LU\",\"MO\",\"MG\",\"MW\",\"MY\",\"MV\",\"ML\",\"MT\",\"MH\",\"MQ\",\"MR\",\"MU\",\"YT\",\"MX\",\"FM\",\"MD\",\"MC\",\"MN\",\"ME\",\"MS\",\"MA\",\"MZ\",\"MM\",\"NA\",\"NR\",\"NP\",\"NL\",\"AN\",\"NC\",\"NZ\",\"NI\",\"NE\",\"NG\",\"NU\",\"NF\",\"MP\",\"NO\",\"OM\",\"PK\",\"PW\",\"PS\",\"PA\",\"PG\",\"PY\",\"PE\",\"PH\",\"PN\",\"PL\",\"PT\",\"PR\",\"QA\",\"RE\",\"RO\",\"RU\",\"RW\",\"BL\",\"SH\",\"KN\",\"LC\",\"MF\",\"PM\",\"VC\",\"WS\",\"SM\",\"ST\",\"SA\",\"SN\",\"RS\",\"SC\",\"SL\",\"SG\",\"SK\",\"SI\",\"SB\",\"SO\",\"ZA\",\"GS\",\"ES\",\"LK\",\"SD\",\"SR\",\"SJ\",\"SZ\",\"SE\",\"SX\",\"CH\",\"SY\",\"TW\",\"TJ\",\"TZ\",\"TH\",\"TL\",\"TG\",\"TK\",\"TO\",\"TT\",\"TN\",\"TR\",\"TM\",\"TC\",\"TV\",\"UG\",\"UA\",\"AE\",\"GB\",\"US\",\"UM\",\"UY\",\"UZ\",\"VU\",\"VE\",\"VN\",\"VG\",\"VI\",\"WF\",\"EH\",\"YE\",\"ZM\",\"ZW\"]';");
 }
 
 if (file_exists("/home/xtreamcodes/iptv_xtream_codes/admin/.update")) {
@@ -1699,7 +1745,8 @@ if (file_exists("/home/xtreamcodes/iptv_xtream_codes/admin/.update")) {
     }
 }
 
-$_GET = XSSRow($_GET); $_POST = XSSRow($_POST); // Parse user input.
+$rTableSearch = strtolower(basename($_SERVER["SCRIPT_FILENAME"], '.php')) === "table_search";
+$_GET = XSSRow($_GET, $rTableSearch); $_POST = XSSRow($_POST, $rTableSearch); // Parse user input.
 
 if (isset($_SESSION['hash'])) {
     $rUserInfo = getRegisteredUserHash($_SESSION['hash']);
@@ -1708,7 +1755,7 @@ if (isset($_SESSION['hash'])) {
     $rSettings["sidebar"] = $rUserInfo["sidebar"];
     $rPermissions = getPermissions($rUserInfo['member_group_id']);
     if ($rPermissions["is_admin"]) {
-        $rPermissions["is_reseller"] = 0; // Don't allow Admin & Reseller!
+        $rPermissions["is_reseller"] = 0;
     }
 	$rPermissions["advanced"] = json_decode($rPermissions["allowed_pages"], True);
     if ((!$rUserInfo) or (!$rPermissions) or ((!$rPermissions["is_admin"]) && (!$rPermissions["is_reseller"])) or (($_SESSION['ip'] <> getIP()) && ($rAdminSettings["ip_logout"]))) {

@@ -98,8 +98,10 @@ if ($rSettings["sidebar"]) {
                                             <td><?=$rFolder["directory"]?></td>
                                             <td class="text-center"><?=$rDate?></td>
                                             <td class="text-center">
-                                                <a href="./watch_add.php?id=<?=$rFolder["id"]?>"><button type="button" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rFolder["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                <div class="btn-group">
+                                                    <a href="./watch_add.php?id=<?=$rFolder["id"]?>"><button type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rFolder["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <?php } ?>

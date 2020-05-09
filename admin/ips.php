@@ -67,7 +67,7 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=date("Y-m-d", $rIP["date"])?></td>
                                             <td class="text-center"><?=$rIP["attempts_blocked"]?></td>
                                             <td class="text-center">
-                                                <button type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rIP["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                <button type="button" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rIP["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
                                             </td>
                                         </tr>
                                         <?php } ?>

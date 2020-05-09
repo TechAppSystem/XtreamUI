@@ -145,11 +145,16 @@ if (isset($_POST["submit_user"])) {
                 }
                 if ($rArray["is_mag"] == 1) {
 					if (hasPermissions("adv", "add_mag")) {
+                        if (isset($_POST["lock_device"])) {
+                            $rSTBLock = 1;
+                        } else {
+                            $rSTBLock = 0;
+                        }
 						$result = $db->query("SELECT `mag_id` FROM `mag_devices` WHERE `user_id` = ".intval($rInsertID)." LIMIT 1;");
 						if ((isset($result)) && ($result->num_rows == 1)) {
-							$db->query("UPDATE `mag_devices` SET `mac` = '".base64_encode(ESC($_POST["mac_address_mag"]))."' WHERE `user_id` = ".intval($rInsertID).";");
+							$db->query("UPDATE `mag_devices` SET `mac` = '".base64_encode(ESC($_POST["mac_address_mag"]))."', `lock_device` = ".intval($rSTBLock)." WHERE `user_id` = ".intval($rInsertID).";");
 						} else {
-							$db->query("INSERT INTO `mag_devices`(`user_id`, `mac`) VALUES(".intval($rInsertID).", '".ESC(base64_encode($_POST["mac_address_mag"]))."');");
+							$db->query("INSERT INTO `mag_devices`(`user_id`, `mac`, `lock_device`) VALUES(".intval($rInsertID).", '".ESC(base64_encode($_POST["mac_address_mag"]))."', ".intval($rSTBLock).");");
 						}
 						if (isset($_POST["edit"])) {
 							$db->query("DELETE FROM `enigma2_devices` WHERE `user_id` = ".intval($rInsertID).";");
@@ -190,8 +195,10 @@ if (isset($_GET["id"])) {
 	if (($rUser["is_e2"]) && (!hasPermissions("adv", "edit_e2"))) {
 		exit;
 	}
-    $rUser["mac_address_mag"] = getMAGUser($_GET["id"]);
-    $rUser["mac_address_e2"] = getE2User($_GET["id"]);
+    $rMAGUser = getMAGUser($_GET["id"]);
+    $rUser["lock_device"] = $rMAGUser["lock_device"];
+    $rUser["mac_address_mag"] = base64_decode($rMAGUser["mac"]);
+    $rUser["mac_address_e2"] = getE2User($_GET["id"])["mac"];
     $rUser["outputs"] = getOutputs($rUser["id"]);
 } else if (!hasPermissions("adv", "add_user")) { exit; }
 
@@ -406,6 +413,10 @@ if ($rSettings["sidebar"]) {
                                                             <label class="col-md-4 col-form-label" for="is_trial">Trial Account</label>
                                                             <div class="col-md-2">
                                                                 <input name="is_trial" id="is_trial" type="checkbox" <?php if (isset($rUser)) { if ($rUser["is_trial"] == 1) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                            <label class="col-md-4 col-form-label" for="lock_device">MAG STB Lock</label>
+                                                            <div class="col-md-2">
+                                                                <input name="lock_device" id="lock_device" type="checkbox" <?php if (isset($rUser)) { if ($rUser["lock_device"] == 1) { echo "checked "; } } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4" style="display:none" id="mac_entry_mag">
@@ -650,6 +661,7 @@ if ($rSettings["sidebar"]) {
                 if ($("#is_mag").is(":checked")) {
 					<?php if (hasPermissions("adv", "add_mag")) { ?>
                     $("#mac_entry_mag").show();
+                    window.swObjs["lock_device"].enable();
 					<?php }
 					if (hasPermissions("adv", "add_e2")) { ?>
                     window.swObjs["is_e2"].disable();
@@ -660,6 +672,7 @@ if ($rSettings["sidebar"]) {
 					<?php }
 					if (hasPermissions("adv", "add_e2")) { ?>
                     window.swObjs["is_mag"].disable();
+                    window.swObjs["lock_device"].disable();
 					<?php } ?>
                 }
             } else {
@@ -671,6 +684,7 @@ if ($rSettings["sidebar"]) {
 				$("#mac_entry_mag").hide();
                 window.swObjs["is_mag"].enable();
 				<?php } ?>
+                window.swObjs["lock_device"].disable();
             }
         }
         

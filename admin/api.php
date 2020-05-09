@@ -296,6 +296,16 @@ if (isset($_GET["action"])) {
         } else {
             echo json_encode(Array("result" => False));exit;
         }
+    } else if ($_GET["action"] == "isp") {
+        if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "block_isps"))) { echo json_encode(Array("result" => False)); exit; }
+        $rISPID = intval($_GET["isp_id"]);
+        $rSub = $_GET["sub"];
+        if ($rSub == "delete") {
+            $db->query("DELETE FROM `isp_addon` WHERE `id` = ".intval($rISPID).";");
+            echo json_encode(Array("result" => True));exit;
+        } else {
+            echo json_encode(Array("result" => False));exit;
+        }
     } else if ($_GET["action"] == "ip") {
         if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "block_ips"))) { echo json_encode(Array("result" => False)); exit; }
         $rIPID = intval($_GET["ip"]);
@@ -689,9 +699,6 @@ if (isset($_GET["action"])) {
         if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "epg"))) { echo json_encode(Array("result" => False)); exit; }
         sexec($_INFO["server_id"], "/home/xtreamcodes/iptv_xtream_codes/php/bin/php /home/xtreamcodes/iptv_xtream_codes/crons/epg.php");
         echo json_encode(Array("result" => True));exit;
-	} else if ($_GET["action"] == "remote_cmd") {
-		if ((!$rPermissions["is_admin"]) OR (!hasPermissions("adv", "database"))) { echo json_encode(Array("result" => False)); exit; }
-		echo json_encode(Array("result" => True, "data" => remoteCMD($_GET["server"], $_GET["cmd"])));exit;
     } else if ($_GET["action"] == "tmdb_search") {
         if ((!$rPermissions["is_admin"]) OR ((!hasPermissions("adv", "add_series")) && (!hasPermissions("adv", "edit_series")) && (!hasPermissions("adv", "add_movie")) && (!hasPermissions("adv", "edit_movie")) && (!hasPermissions("adv", "add_episode")) && (!hasPermissions("adv", "edit_episode")))) { echo json_encode(Array("result" => False)); exit; }
         include "tmdb.php";
@@ -810,7 +817,7 @@ if (isset($_GET["action"])) {
         set_time_limit(300);
         ini_set('max_execution_time', 300);
         ini_set('default_socket_timeout', 300);
-        echo shell_exec("/home/xtreamcodes/iptv_xtream_codes/bin/ffprobe -v quiet -probesize 2000000 -print_format json -show_format -show_streams \"".$_GET["stream"]."\"");exit;
+        echo shell_exec("/home/xtreamcodes/iptv_xtream_codes/bin/ffprobe -v quiet -probesize 2000000 -print_format json -show_format -show_streams \"".escapeshellcmd($_GET["stream"])."\"");exit;
     } else if ($_GET["action"] == "clear_logs") {
         if ((!$rPermissions["is_admin"]) OR ((!hasPermissions("adv", "reg_userlog")) && (!hasPermissions("adv", "client_request_log")) && (!hasPermissions("adv", "connection_logs")) && (!hasPermissions("adv", "stream_errors")) && (!hasPermissions("adv", "credits_log")) && (!hasPermissions("adv", "folder_watch_settings")))) { echo json_encode(Array("result" => False)); exit; }
         if (strlen($_GET["from"]) == 0) {
@@ -870,6 +877,15 @@ if (isset($_GET["action"])) {
             $rCommand = "mysqldump -u ".$_INFO["db_user"]." -p".$_INFO["db_pass"]." -P ".$_INFO["db_port"]." ".$_INFO["db_name"]." --ignore-table=xtream_iptvpro.user_activity --ignore-table=xtream_iptvpro.stream_logs --ignore-table=xtream_iptvpro.panel_logs --ignore-table=xtream_iptvpro.client_logs --ignore-table=xtream_iptvpro.epg_data > \"".$rFilename."\"";
             $rRet = shell_exec($rCommand);
             if (file_exists($rFilename)) {
+                $rBackups = getBackups();
+                if ((count($rBackups) > intval($rAdminSettings["backups_to_keep"])) && (intval($rAdminSettings["backups_to_keep"]) > 0)) {
+                    $rDelete = array_slice($rBackups, 0, count($rBackups) - intval($rAdminSettings["backups_to_keep"]));
+                    foreach ($rDelete as $rItem) {
+                        if (file_exists(MAIN_DIR."adtools/backups/".$rItem["filename"])) {
+                            unlink(MAIN_DIR."adtools/backups/".$rItem["filename"]);
+                        }
+                    }
+                }
                 echo json_encode(Array("result" => True, "data" => Array("filename" => pathinfo($rFilename)["filename"].".sql", "timestamp" => filemtime($rFilename), "date" => date("Y-m-d H:i:s", filemtime($rFilename)))));exit;
             }
             echo json_encode(Array("result" => True));exit;

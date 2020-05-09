@@ -42,6 +42,12 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
     } else {
         $rAdminSettings["ip_logout"] = false;
     }
+    if (isset($_POST["alternate_scandir"])) {
+        $rAdminSettings["alternate_scandir"] = true;
+        unset($_POST["alternate_scandir"]);
+    } else {
+        $rAdminSettings["alternate_scandir"] = false;
+    }
 	if (isset($_POST["recaptcha_enable"])) {
         $rAdminSettings["recaptcha_enable"] = true;
         unset($_POST["recaptcha_enable"]);
@@ -132,6 +138,14 @@ if ((isset($_POST["submit_settings"])) && (hasPermissions("adv", "settings"))) {
     if (isset($_POST["release_parser"])) {
         $rAdminSettings["release_parser"] = $_POST["release_parser"];
         unset($_POST["release_parser"]);
+    }
+    if (isset($_POST["automatic_backups"])) {
+        $rAdminSettings["automatic_backups"] = $_POST["automatic_backups"];
+        unset($_POST["automatic_backups"]);
+    }
+    if (isset($_POST["backups_to_keep"])) {
+        $rAdminSettings["backups_to_keep"] = $_POST["backups_to_keep"];
+        unset($_POST["backups_to_keep"]);
     }
     //if (isset($_POST["language"])) {
         //$rAdminSettings["language"] = $_POST["language"];
@@ -259,25 +273,32 @@ if ($rSettings["sidebar"]) {
                                 <div class="card-body">
 									<div class="bg-soft-light border-light border">
 										<div class="row text-center">
-											<div class="col-md-4">
+											<div class="col-md-3">
 												<p class="text-muted mb-0 mt-3">Installed Version</p>
 												<h2 class="font-weight-normal mb-3">
-													<small class="mdi mdi-checkbox-blank-circle text-muted align-middle mr-1"></small>
+													<small class="mdi mdi-checkbox-blank-circle text-success align-middle mr-1"></small>
 													<span><?=$rRelease?><sup class="font-13"><?=$rEarlyAccess?></sup></span>
 												</h2>
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-3">
 												<p class="text-muted mb-0 mt-3">Official Release</p>
 												<h2 class="font-weight-normal mb-3">
 													<small class="mdi mdi-checkbox-blank-circle text-info align-middle mr-1"></small>
 													<span><?=$rCurrent["official"][0]?><sup class="font-13"> <?=$rCurrent["official"][1]?></sup></span>
 												</h2>
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-3">
 												<p class="text-muted mb-0 mt-3">Early Access Release</p>
 												<h2 class="font-weight-normal mb-3">
 													<small class="mdi mdi-checkbox-blank-circle text-danger align-middle mr-1"></small>
 													<span><?=$rCurrent["ea"][0]?><sup class="font-13"><?=$rCurrent["ea"][1]?></sup></span>
+												</h2>
+											</div>
+                                            <div class="col-md-3">
+												<p class="text-muted mb-0 mt-3">GeoLite2 Version</p>
+												<h2 class="font-weight-normal mb-3">
+													<small class="mdi mdi-checkbox-blank-circle text-pink align-middle mr-1"></small>
+													<span><?=substr($rAdminSettings["geolite2_version"], 4, 2).".".substr($rAdminSettings["geolite2_version"], 6, 2)?></span>
 												</h2>
 											</div>
 										</div>
@@ -359,7 +380,7 @@ if ($rSettings["sidebar"]) {
                                                             </div>
                                                         </div>
                                                         <div class="form-group row mb-4">
-                                                            <label class="col-md-4 col-form-label" for="bouquet_name">Bouquet Name</label>
+                                                            <label class="col-md-4 col-form-label" for="bouquet_name">Enigma2 Bouquet Name</label>
                                                             <div class="col-md-8">
                                                                 <input type="text" class="form-control" id="bouquet_name" name="bouquet_name" value="<?=htmlspecialchars($rSettings["bouquet_name"])?>">
                                                             </div>
@@ -517,6 +538,12 @@ if ($rSettings["sidebar"]) {
                                                             <label class="col-md-4 col-form-label" for="auto_refresh">Auto-Refresh by Default <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Auto-refresh pages by deault, where auto-refresh is available." class="mdi mdi-information"></i></label>
                                                             <div class="col-md-2">
                                                                 <input name="auto_refresh" id="auto_refresh" type="checkbox"<?php if ($rAdminSettings["auto_refresh"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row mb-4">
+                                                            <label class="col-md-4 col-form-label" for="alternate_scandir">Alternate Scandir Method (Cloud) <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Use an alternate method of scanning directories, works with cloud servers. Slower!" class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input name="alternate_scandir" id="alternate_scandir" type="checkbox"<?php if ($rSettings["alternate_scandir"] == 1) { echo "checked "; } ?>data-plugin="switchery" class="js-switch" data-color="#039cfd"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -890,6 +917,20 @@ if ($rSettings["sidebar"]) {
                                             <div class="tab-pane" id="backups">
                                                 <div class="row">
                                                     <div class="col-12">
+                                                        <div class="form-group row mb-4">
+                                                            <label class="col-md-4 col-form-label" for="automatic_backups">Automatic Backups</label>
+                                                            <div class="col-md-2">
+                                                                <select name="automatic_backups" id="automatic_backups" class="form-control" data-toggle="select2">
+                                                                    <?php foreach (Array("off" => "Off", "hourly" => "Hourly", "daily" => "Daily", "weekly" => "Weekly", "monthly" => "Monthly") as $rType => $rText) { ?>
+                                                                    <option<?php if ($rAdminSettings["automatic_backups"] == $rType) { echo " selected"; } ?> value="<?=$rType?>"><?=$rText?></option>
+                                                                    <?php } ?>
+                                                                </select>
+                                                            </div>
+                                                            <label class="col-md-4 col-form-label" for="backups_to_keep">Backups to Keep <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Enter 0 for unlimited. Oldest will be deleted." class="mdi mdi-information"></i></label>
+                                                            <div class="col-md-2">
+                                                                <input type="text" class="form-control" id="backups_to_keep" name="backups_to_keep" value="<?=htmlspecialchars($rAdminSettings["backups_to_keep"] ? $rAdminSettings["backups_to_keep"] : 0)?>">
+                                                            </div>
+                                                        </div>
                                                         <table class="table table-borderless mb-0" id="datatable-backups">
                                                             <thead class="thead-light">
                                                                 <tr>
@@ -905,7 +946,8 @@ if ($rSettings["sidebar"]) {
                                                 </div> <!-- end row -->
                                                 <ul class="list-inline wizard mb-0" style="margin-top:30px;">
                                                     <li class="list-inline-item float-right">
-                                                        <button id="create_backup" onClick="api('', 'backup')" class="btn btn-primary">Create Backup</button>
+                                                        <button id="create_backup" onClick="api('', 'backup')" class="btn btn-info">Create Backup Now</button>
+                                                        <input name="submit_settings" type="submit" class="btn btn-primary" value="Save Changes" />
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1028,8 +1070,6 @@ if ($rSettings["sidebar"]) {
 				}
             } else if (rType == "backup") {
                 $("#create_backup").attr("disabled", true);
-            } else if (rType == "download") {
-                window.location.href = "./api.php?action=download&filename=" + encodeURIComponent(rID);
             }
             $.getJSON("./api.php?action=backup&sub=" + rType + "&filename=" + encodeURIComponent(rID), function(data) {
                 if (data.result === true) {
@@ -1122,6 +1162,7 @@ if ($rSettings["sidebar"]) {
             $("#stream_max_analyze").inputFilter(function(value) { return /^\d*$/.test(value); });
             $("#client_prebuffer").inputFilter(function(value) { return /^\d*$/.test(value); });
             $("#restreamer_prebuffer").inputFilter(function(value) { return /^\d*$/.test(value); });
+            $("#backups_to_keep").inputFilter(function(value) { return /^\d*$/.test(value); });
         });
         </script>
     </body>

@@ -105,17 +105,19 @@ if ($rSettings["sidebar"]) {
                                             <td class="text-center"><?=intval($rWatchDog["total_mem_used_percent"])?>%</td>
                                             <td class="text-center">
 												<?php if (hasPermissions("adv", "edit_server")) { ?>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Restart Services" class="btn btn-outline-primary waves-effect waves-light btn-xs btn-reboot-server" data-id="<?=$rServer["id"]?>"><i class="mdi mdi-restart"></i></button>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Start All Streams" class="btn btn-outline-purple waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'start');"><i class="mdi mdi-play"></i></button>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Stop All Streams" class="btn btn-outline-pink waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'stop');"><i class="mdi mdi-stop"></i></button>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Kill All Connections" class="btn btn-outline-warning waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'kill');"><i class="fas fa-hammer"></i></button>
-                                                <a href="./server.php?id=<?=$rServer["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Server" class="btn btn-outline-info waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
-												<?php if ($rServer["can_delete"] == 1) { ?>
-                                                <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete Server" class="btn btn-outline-danger waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
-                                                <?php } else { ?>
-                                                <button disabled type="button" class="btn btn-outline-danger waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button>
-                                                <?php }
-												} else { echo "--"; } ?>
+                                                <div class="btn-group">
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Restart Services" class="btn btn-light waves-effect waves-light btn-xs btn-reboot-server" data-id="<?=$rServer["id"]?>"><i class="mdi mdi-restart"></i></button>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Start All Streams" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'start');"><i class="mdi mdi-play"></i></button>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Stop All Streams" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'stop');"><i class="mdi mdi-stop"></i></button>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Kill All Connections" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'kill');"><i class="fas fa-hammer"></i></button>
+                                                    <a href="./server.php?id=<?=$rServer["id"]?>"><button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Server" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-pencil-outline"></i></button></a>
+                                                    <?php if ($rServer["can_delete"] == 1) { ?>
+                                                    <button type="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete Server" class="btn btn-light waves-effect waves-light btn-xs" onClick="api(<?=$rServer["id"]?>, 'delete');"><i class="mdi mdi-close"></i></button>
+                                                    <?php } else { ?>
+                                                    <button disabled type="button" class="btn btn-light waves-effect waves-light btn-xs"><i class="mdi mdi-close"></i></button>
+                                                    <?php } ?>
+                                                </div>
+												<?php } else { echo "--"; } ?>
                                             </td>
                                         </tr>
                                         <?php } ?>

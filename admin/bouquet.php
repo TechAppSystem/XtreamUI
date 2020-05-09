@@ -462,16 +462,16 @@ if ($rSettings["sidebar"]) {
             $.post("./api.php?action=review_bouquet", {"data": rBouquet}, function(rData) {
                 if (rData.result === true) {
                     $(rData.streams).each(function(rIndex) {
-                        rTable.row.add([rData.streams[rIndex].id, '<?=$_["stream"]?>', rData.streams[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.streams[rIndex].id + ', \'stream\', true);"><i class="mdi mdi-minus"></i></button>']);
+                        rTable.row.add([rData.streams[rIndex].id, '<?=$_["stream"]?>', rData.streams[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.streams[rIndex].id + ', \'stream\', true);"><i class="mdi mdi-minus"></i></button>']);
                     });
                     $(rData.vod).each(function(rIndex) {
-                        rTable.row.add([rData.vod[rIndex].id, '<?=$_["movie"]?>', rData.vod[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.vod[rIndex].id + ', \'vod\', true);"><i class="mdi mdi-minus"></i></button>']);
+                        rTable.row.add([rData.vod[rIndex].id, '<?=$_["movie"]?>', rData.vod[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.vod[rIndex].id + ', \'vod\', true);"><i class="mdi mdi-minus"></i></button>']);
                     });
                     $(rData.radios).each(function(rIndex) {
-                        rTable.row.add([rData.radios[rIndex].id, '<?=$_["radio"]?>', rData.radios[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.radios[rIndex].id + ', \'radios\', true);"><i class="mdi mdi-minus"></i></button>']);
+                        rTable.row.add([rData.radios[rIndex].id, '<?=$_["radio"]?>', rData.radios[rIndex].stream_display_name, '<button type="button" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.radios[rIndex].id + ', \'radios\', true);"><i class="mdi mdi-minus"></i></button>']);
                     });
                     $(rData.series).each(function(rIndex) {
-                        rTable.row.add([rData.series[rIndex].id, '<?=$_["series"]?>', rData.series[rIndex].title, '<button type="button" class="btn-remove btn btn-outline-danger waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.series[rIndex].id + ', \'series\', true);"><i class="mdi mdi-minus"></i></button>']);
+                        rTable.row.add([rData.series[rIndex].id, '<?=$_["series"]?>', rData.series[rIndex].title, '<button type="button" class="btn-remove btn btn-light waves-effect waves-light btn-xs" onClick="toggleBouquet(' + rData.series[rIndex].id + ', \'series\', true);"><i class="mdi mdi-minus"></i></button>']);
                     });
                 } else {
                     alert("Bouquet review failed!");

@@ -1,5 +1,23 @@
 # Beta Release 22E
 
+* Now hosting an IP to ISP server to enable ISP support for all users of Xtream UI.
+* Added ISP blocking.
+* Removed remote command legacy API request.
+* Escaped shell commands.
+* Added automatic backups, with auto-delete option.
+* Removed colours from buttons, grouped for better fit.
+* Fixed radio sort in bouquet order.
+* Reworked escaping for POST and GET requests to avoid possible injection.
+* Modified login to increase security when forced to change password by minimum password lenth option.
+* Added alternative scandir option for cloud servers. Found in settings.
+* Added IP validation to block IP page.
+* Added GeoLite2 database version to settings page.
+* Fixed GeoLite2 update for servers that block chattr sudo execution (see below FAQ).
+* Added device lock toggle to MAG edit page.
+* Added mass edit device lock reset, and device lock toggle.
+
+# Beta Release 22E
+
 * Refined santisation for speed. No longer sanitises MySQL output, only input.
 * Added STB lock reset to MAG Events for those who have issues with MAG devices.
 * Added a timeout to mysql queries for those with too many user_activity entries for the page to load.
